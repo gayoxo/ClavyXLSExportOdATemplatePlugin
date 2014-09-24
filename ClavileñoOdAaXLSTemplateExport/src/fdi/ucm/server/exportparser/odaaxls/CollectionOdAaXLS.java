@@ -84,7 +84,12 @@ public class CollectionOdAaXLS {
         	 
         	 if (Recursos!=null)
         		 processGrammar2(libro,Recursos,clave,cL,salvar.getEstructuras(),soloEstructura,VirtualObject);
+        	 
+        	 if (Datos==null&&MetaDatos==null&&Recursos==null)
+        		 libro.createSheet();
         }
+        else libro.createSheet();
+        	
 			
         
         
@@ -108,7 +113,8 @@ public class CollectionOdAaXLS {
         
 	}
 	
-	  private static CompleteElementType findDatos(ArrayList<CompleteStructure> sons) {
+
+	private static CompleteElementType findDatos(ArrayList<CompleteStructure> sons) {
 		  for (CompleteStructure completeStruct : sons) {
 				if (completeStruct instanceof CompleteElementType && StaticFuctionsOdAaXLS.isDatos((CompleteElementType)completeStruct))
 					return (CompleteElementType)completeStruct;
@@ -390,7 +396,7 @@ public class CollectionOdAaXLS {
 	        	
 	        	if (i==0)
 	        	{
-	        		for (int j = 0; j < columnsMax+2; j++) {
+	        		for (int j = 0; j < columnsMax+1; j++) {
 		        		
 		        		String Value = "";
 		            	if (j==0)
