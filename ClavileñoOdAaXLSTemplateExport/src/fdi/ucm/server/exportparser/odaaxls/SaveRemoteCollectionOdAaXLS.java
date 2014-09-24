@@ -1,7 +1,7 @@
 /**
  * 
  */
-package fdi.ucm.server.exportparser.xls;
+package fdi.ucm.server.exportparser.odaaxls;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import fdi.ucm.server.modelComplete.collection.CompleteCollectionLog;
  * @author Joaquin Gayoso-Cabada
  *
  */
-public class SaveRemoteCollectionXLS extends SaveCollection {
+public class SaveRemoteCollectionOdAaXLS extends SaveCollection {
 
 	
 	private String FileO = null;
@@ -25,7 +25,7 @@ public class SaveRemoteCollectionXLS extends SaveCollection {
 	private boolean SoloEstructura;
 
 
-	public SaveRemoteCollectionXLS() {
+	public SaveRemoteCollectionOdAaXLS() {
 		super();
 	}
 	
@@ -39,7 +39,7 @@ public class SaveRemoteCollectionXLS extends SaveCollection {
 
 		CompleteCollectionLog CL=new CompleteCollectionLog();
 		try {
-			FileO=CollectionXLSI.processCompleteCollection(CL,Salvar,SoloEstructura,PathTemporalFiles);
+			FileO=CollectionOdAaXLS.processCompleteCollection(CL,Salvar,SoloEstructura,PathTemporalFiles);
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Error en carpeta y escritura del archivo en el servidor");
