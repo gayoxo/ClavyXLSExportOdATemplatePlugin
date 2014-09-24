@@ -208,6 +208,10 @@ public class CollectionOdAaXLS {
 		            		clave.put(ListaElementos.get(j-2).getClavilenoid(), Column);
 		            		Column++;
 		            		}
+		            	else
+		            	{
+		            		hoja.setColumnWidth(j, 12750);
+		            	}
 		            	
 		            	celda.setCellValue(Value);
 		            
