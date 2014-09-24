@@ -83,7 +83,7 @@ public class SaveRemoteCollectionXLS extends SaveCollection {
 	 */
 	@Override
 	public String getName() {
-		return "XLS";
+		return "ODA a XLS Template";
 	}
 	
 	
