@@ -83,7 +83,7 @@ public class SaveRemoteCollectionOdAaXLS extends SaveCollection {
 	 */
 	@Override
 	public String getName() {
-		return "XLS de estructura OdA como Template de carga/update de datos";
+		return "ODA a XLS Template";
 	}
 	
 	
