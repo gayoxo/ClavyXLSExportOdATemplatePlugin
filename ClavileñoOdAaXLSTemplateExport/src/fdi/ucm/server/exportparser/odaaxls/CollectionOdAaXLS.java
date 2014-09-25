@@ -85,6 +85,8 @@ public class CollectionOdAaXLS {
         	 if (Recursos!=null)
         		 processGrammar2(libro,Recursos,clave,cL,salvar.getEstructuras(),soloEstructura,VirtualObject);
         }
+        else
+        	cL.getLogLines().add("No posee un Objeto Virtual");
 			
         
         
