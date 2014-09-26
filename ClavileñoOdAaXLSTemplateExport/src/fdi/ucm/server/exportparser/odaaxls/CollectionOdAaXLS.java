@@ -301,19 +301,37 @@ public class CollectionOdAaXLS {
 	            		ArrayList<CompleteElement> temp = ListaClave.get(c-2);
 	            		if (temp!=null)
 	            		{
-	            		for (CompleteElement completeElement : temp) {
-	            			if (!Value.isEmpty())
-	            				Value=Value+" "; 
-							if (completeElement instanceof CompleteTextElement)
-								Value=Value+((CompleteTextElement)completeElement).getValue();
+	            			if (temp.size()>1)
+	            			{
+	            			StringBuffer SB=new StringBuffer();
+	            			SB.append("Size: " +temp.size());
+	            			for (CompleteElement completeElement : temp) {
+	            				SB.append("{");
+								if (completeElement instanceof CompleteTextElement)
+									SB.append(((CompleteTextElement)completeElement).getValue());
+								else if (completeElement instanceof CompleteLinkElement)
+									SB.append(((CompleteLinkElement)completeElement).getValue().getClavilenoid());
+								else if (completeElement instanceof CompleteResourceElementURL)
+									SB.append(((CompleteResourceElementURL)completeElement).getValue());
+								else if (completeElement instanceof CompleteResourceElementFile)
+									SB.append(((CompleteResourceElementFile)completeElement).getValue().getPath());
+								SB.append("}");
+							}
+	            			Value=SB.toString();
+	            			}
+	            		else if (temp.size()>0){
+	            			CompleteElement completeElement=temp.get(0);
+	            			if (completeElement instanceof CompleteTextElement)
+		            			Value=(((CompleteTextElement)completeElement).getValue());
 							else if (completeElement instanceof CompleteLinkElement)
-								Value=Value+((CompleteLinkElement)completeElement).getValue().getClavilenoid();
+		            			Value=Long.toString((((CompleteLinkElement)completeElement).getValue().getClavilenoid()));
 							else if (completeElement instanceof CompleteResourceElementURL)
-								Value=Value+((CompleteResourceElementURL)completeElement).getValue();
+		            			Value=(((CompleteResourceElementURL)completeElement).getValue());
 							else if (completeElement instanceof CompleteResourceElementFile)
-								Value=Value+((CompleteResourceElementFile)completeElement).getValue().getPath();
-								
-						}
+		            			Value=(((CompleteResourceElementFile)completeElement).getValue().getPath());
+	            		}
+
+	            		
 	            		}
 	            		}
 	
