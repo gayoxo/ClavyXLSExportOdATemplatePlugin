@@ -238,7 +238,7 @@ public class CollectionOdAaXLS {
 		            		Value="Clavy Type Id ( DO NOT MODIFY THIS ROW )";
 		            	else 
 		            		if (j==1)
-		            			Value=" -- ";
+		            			Value=Long.toString(grammar.getClavilenoid());
 		            		else
 		            		{
 		            		CompleteElementType TmpEle = ListaElementos.get(j-2);
