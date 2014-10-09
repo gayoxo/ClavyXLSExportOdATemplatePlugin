@@ -42,6 +42,80 @@ public class StaticFuctionsOdAaXLS {
 	}
 	
 	/**
+	 * Revisa si un elemento es VirtualObject
+	 * @param hastype
+	 * @return
+	 */
+	public static boolean isFiles(CompleteGrammar hastype) {
+		
+		ArrayList<CompleteOperationalView> Shows = hastype.getViews();
+		for (CompleteOperationalView show : Shows) {
+			
+			if (show.getName().equals(StaticNamesOdAaXLS.META))
+			{
+				ArrayList<CompleteOperationalValueType> ShowValue = show.getValues();
+				for (CompleteOperationalValueType CompleteOperationalValueType : ShowValue) {
+					if (CompleteOperationalValueType.getName().equals(StaticNamesOdAaXLS.TYPE))
+						if (CompleteOperationalValueType.getDefault().equals(StaticNamesOdAaXLS.FILE)) 
+										return true;
+
+				}
+			}
+		}
+		return false;
+	}
+	
+	
+	
+	/**
+	 * Revisa si un elemento es FileResource
+	 * @param hastype
+	 * @return
+	 */
+	public static boolean isFileFisico(CompleteElementType hastype) {
+		
+		ArrayList<CompleteOperationalView> Shows = hastype.getShows();
+		for (CompleteOperationalView show : Shows) {
+			
+			if (show.getName().equals(StaticNamesOdAaXLS.META))
+			{
+				ArrayList<CompleteOperationalValueType> ShowValue = show.getValues();
+				for (CompleteOperationalValueType CompleteOperationalValueType : ShowValue) {
+					if (CompleteOperationalValueType.getName().equals(StaticNamesOdAaXLS.TYPE))
+						if (CompleteOperationalValueType.getDefault().equals(StaticNamesOdAaXLS.FILERESOURCE)) 
+										return true;
+
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Revisa si un elemento es Owner
+	 * @param hastype
+	 * @return
+	 */
+	public static boolean isOwner(CompleteElementType hastype) {
+		
+		ArrayList<CompleteOperationalView> Shows = hastype.getShows();
+		for (CompleteOperationalView show : Shows) {
+			
+			if (show.getName().equals(StaticNamesOdAaXLS.META))
+			{
+				ArrayList<CompleteOperationalValueType> ShowValue = show.getValues();
+				for (CompleteOperationalValueType CompleteOperationalValueType : ShowValue) {
+					if (CompleteOperationalValueType.getName().equals(StaticNamesOdAaXLS.TYPE))
+						if (CompleteOperationalValueType.getDefault().equals(StaticNamesOdAaXLS.IDOV_OWNER)) 
+										return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	
+	/**
 	 * Revisa si un elemento es METADATOS
 	 * @param hastype
 	 * @return
@@ -106,6 +180,29 @@ public class StaticFuctionsOdAaXLS {
 				for (CompleteOperationalValueType CompleteOperationalValueType : ShowValue) {
 					if (CompleteOperationalValueType.getName().equals(StaticNamesOdAaXLS.TYPE))
 						if (CompleteOperationalValueType.getDefault().equals(StaticNamesOdAaXLS.RECURSO)) 
+										return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Revisa si un elemento es Resources
+	 * @param hastype
+	 * @return
+	 */
+	public static boolean isResources(CompleteElementType hastype) {
+		
+		ArrayList<CompleteOperationalView> Shows = hastype.getShows();
+		for (CompleteOperationalView show : Shows) {
+			
+			if (show.getName().equals(StaticNamesOdAaXLS.META))
+			{
+				ArrayList<CompleteOperationalValueType> ShowValue = show.getValues();
+				for (CompleteOperationalValueType CompleteOperationalValueType : ShowValue) {
+					if (CompleteOperationalValueType.getName().equals(StaticNamesOdAaXLS.TYPE))
+						if (CompleteOperationalValueType.getDefault().equals(StaticNamesOdAaXLS.RESOURCE)) 
 										return true;
 				}
 			}

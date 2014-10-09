@@ -30,6 +30,7 @@ import fdi.ucm.server.modelComplete.collection.document.CompleteResourceElementU
 import fdi.ucm.server.modelComplete.collection.document.CompleteTextElement;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteElementType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteGrammar;
+import fdi.ucm.server.modelComplete.collection.grammar.CompleteIterator;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteLinkElementType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteResourceElementType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteStructure;
@@ -66,28 +67,58 @@ public class CollectionOdAaXLS {
         
 //        Sheet hoja;
         
-        CompleteGrammar VirtualObject=findVO(salvar.getMetamodelGrammar());
-        
        
         
+        Sheet HojaD = libro.createSheet("Datos");
+	   	Sheet HojaM =libro.createSheet("MetaDatos");
+	   	Sheet HojaR =libro.createSheet("Recursos");
+	   	Sheet HojaF =libro.createSheet("Archivos");
+	   	Sheet HojaFR =libro.createSheet("Relacion Recursos");
+       
+	   	CompleteGrammar Files=findFiles(salvar.getMetamodelGrammar());
+	    if (Files!=null)
+        {
+	    		List<CompleteDocuments> ListaDocumentos=generaDocs(salvar.getEstructuras(),Files);
+	    		processFiles(HojaF,Files,clave,cL,ListaDocumentos,soloEstructura);
+        		 
+        	 
+
+
+        }
+        else
+        	cL.getLogLines().add("No posee Files");
+	   	
+	   	
+	    CompleteGrammar VirtualObject=findVO(salvar.getMetamodelGrammar());
         if (VirtualObject!=null)
         {
         	 CompleteElementType Datos=findDatos(VirtualObject.getSons());
         	 CompleteElementType MetaDatos=findMetaDatos(VirtualObject.getSons());
         	 CompleteElementType Recursos=findResources(VirtualObject.getSons());
+        	 CompleteElementType RecursosLink=findResourcesLink(VirtualObject.getSons());
+        	 
+        	 List<CompleteDocuments> ListaDocumentos=generaDocs(salvar.getEstructuras(),VirtualObject);
         	 
         	 if (Datos!=null)
-        		 processGrammar1(libro,Datos,clave,cL,salvar.getEstructuras(),soloEstructura,VirtualObject);
+        		 processDatos(HojaD,Datos,clave,cL,ListaDocumentos,soloEstructura);
+        		 
         	 
         	 if (MetaDatos!=null)
-        		 processGrammar2(libro,MetaDatos,clave,cL,salvar.getEstructuras(),soloEstructura,VirtualObject);
+        		 processMetadatosRecursos(HojaM,MetaDatos,clave,cL,ListaDocumentos,soloEstructura);
+
         	 
         	 if (Recursos!=null)
-        		 processGrammar2(libro,Recursos,clave,cL,salvar.getEstructuras(),soloEstructura,VirtualObject);
+        		 processMetadatosRecursos(HojaR,Recursos,clave,cL,ListaDocumentos,soloEstructura);
+        	 
+        	 if (RecursosLink!=null)
+        		 processRecursosLink(HojaFR,RecursosLink,clave,cL,ListaDocumentos,soloEstructura);
+
         }
         else
         	cL.getLogLines().add("No posee un Objeto Virtual");
 			
+        
+        
         
         
 //        /*Escribimos en el libro*/
@@ -133,9 +164,24 @@ public class CollectionOdAaXLS {
 			}
 			return null;
 	}
+	  
+	  private static CompleteElementType findResourcesLink(List<CompleteStructure> sons) {
+		  for (CompleteStructure completeStruct : sons) {
+			  	if (completeStruct instanceof CompleteIterator)
+			  		{
+			  		CompleteElementType TMP=findResourcesLink(completeStruct.getSons());
+			  		if (TMP!=null)
+			  			return TMP;
+			  		}
+			  	else if (completeStruct instanceof CompleteElementType && StaticFuctionsOdAaXLS.isResources((CompleteElementType)completeStruct))
+			  		return (CompleteElementType)completeStruct;
+			}
+			return null;
+	}
+	  
+	  
+	 
 
-	  
-	  
 	private static CompleteGrammar findVO(List<CompleteGrammar> metamodelGrammar) {
 		for (CompleteGrammar completeGrammar : metamodelGrammar) {
 			if (StaticFuctionsOdAaXLS.isVirtualObject(completeGrammar))
@@ -144,9 +190,33 @@ public class CollectionOdAaXLS {
 		return null;
 	}
 
+	private static CompleteGrammar findFiles(List<CompleteGrammar> metamodelGrammar) {
+		for (CompleteGrammar completeGrammar : metamodelGrammar) {
+			if (StaticFuctionsOdAaXLS.isFiles(completeGrammar))
+				return completeGrammar;
+		}
+		return null;
+	}
+	
+	private static CompleteElementType findFilesFisico(List<CompleteStructure> metaStructures) {
+		for (CompleteStructure completeStructure : metaStructures) {
+			if (completeStructure instanceof CompleteElementType&&StaticFuctionsOdAaXLS.isFileFisico((CompleteElementType)completeStructure))
+				return (CompleteElementType) completeStructure;
+		}
+		return null;
+	}
+	
+	private static CompleteElementType findOwner(List<CompleteStructure> metaStructures) {
+		for (CompleteStructure completeStructure : metaStructures) {
+			if (completeStructure instanceof CompleteElementType&&StaticFuctionsOdAaXLS.isOwner((CompleteElementType)completeStructure))
+				return (CompleteElementType) completeStructure;
+		}
+		return null;
+	}
+	
 	/**
 	 * Para los datos
-	 * @param libro
+	 * @param hoja
 	 * @param grammar
 	 * @param clave
 	 * @param cL
@@ -154,13 +224,9 @@ public class CollectionOdAaXLS {
 	 * @param soloEstructura
 	 * @param virtualObject
 	 */
-	private static void processGrammar1(Workbook libro, CompleteElementType grammar,
-			HashMap<Long, Integer> clave, CompleteCollectionLog cL, List<CompleteDocuments> list, boolean soloEstructura, CompleteGrammar virtualObject) {
+	private static void processDatos(Sheet hoja, CompleteElementType grammar,
+			HashMap<Long, Integer> clave, CompleteCollectionLog cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura) {
 		  
-		   Sheet hoja;
-		if (!grammar.getName().isEmpty())
-	        	 hoja = libro.createSheet(grammar.getName());
-	        else hoja = libro.createSheet();
 	  
 	        
 	        List<CompleteElementType> ListaElementos=generaLista(grammar);
@@ -168,11 +234,11 @@ public class CollectionOdAaXLS {
 
 	        if (ListaElementos.size()>255)
 	        	{
-	        	cL.getLogLines().add("Tamaño de estructura demasiado grande para exportar a xls para gramatica: " + grammar.getName() +" solo 255 estructuras seran grabadas, divide en gramaticas mas simples");
+	        	cL.getLogLines().add("Tamaño de estructura demasiado grande para exportar a xls para structura: " + grammar.getName() +" solo 255 estructuras seran grabadas, divide en gramaticas mas simples");
 	        	ListaElementos=ListaElementos.subList(0, 254);
 	        	}
 	        
-	        List<CompleteDocuments> ListaDocumentos=generaDocs(list,virtualObject);
+	        
 	      
 	        if (ListaDocumentos.size()+2>65536)
 	    	{
@@ -238,7 +304,7 @@ public class CollectionOdAaXLS {
 		            		Value="Clavy Type Id ( DO NOT MODIFY THIS ROW )";
 		            	else 
 		            		if (j==1)
-		            			Value=Long.toString(grammar.getClavilenoid());
+		            			Value="--";
 		            		else
 		            		{
 		            		CompleteElementType TmpEle = ListaElementos.get(j-2);
@@ -301,25 +367,7 @@ public class CollectionOdAaXLS {
 	            		ArrayList<CompleteElement> temp = ListaClave.get(c-2);
 	            		if (temp!=null)
 	            		{
-	            			if (temp.size()>1)
-	            			{
-	            			StringBuffer SB=new StringBuffer();
-	            			SB.append("Size: " +temp.size());
-	            			for (CompleteElement completeElement : temp) {
-	            				SB.append("{");
-								if (completeElement instanceof CompleteTextElement)
-									SB.append(((CompleteTextElement)completeElement).getValue());
-								else if (completeElement instanceof CompleteLinkElement)
-									SB.append(((CompleteLinkElement)completeElement).getValue().getClavilenoid());
-								else if (completeElement instanceof CompleteResourceElementURL)
-									SB.append(((CompleteResourceElementURL)completeElement).getValue());
-								else if (completeElement instanceof CompleteResourceElementFile)
-									SB.append(((CompleteResourceElementFile)completeElement).getValue().getPath());
-								SB.append("}");
-							}
-	            			Value=SB.toString();
-	            			}
-	            		else if (temp.size()>0){
+	            			if (temp.size()>0){
 	            			CompleteElement completeElement=temp.get(0);
 	            			if (completeElement instanceof CompleteTextElement)
 		            			Value=(((CompleteTextElement)completeElement).getValue());
@@ -364,7 +412,7 @@ public class CollectionOdAaXLS {
 	
 	/**
 	 * Para todo lo que no son los datos
-	 * @param libro
+	 * @param hoja
 	 * @param grammar
 	 * @param clave
 	 * @param cL
@@ -372,16 +420,13 @@ public class CollectionOdAaXLS {
 	 * @param soloEstructura
 	 * @param virtualObject
 	 */
-	private static void processGrammar2(Workbook libro, CompleteElementType grammar,
-			HashMap<Long, Integer> clave, CompleteCollectionLog cL, List<CompleteDocuments> list, boolean soloEstructura, CompleteGrammar virtualObject) {
+	private static void processMetadatosRecursos(Sheet hoja, CompleteElementType grammar,
+			HashMap<Long, Integer> clave, CompleteCollectionLog cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura) {
 		  
-		   Sheet hoja;
-		if (!grammar.getName().isEmpty())
-	        	 hoja = libro.createSheet(grammar.getName());
-	        else hoja = libro.createSheet();
-	  
-	        
-	        List<CompleteElementType> ListaElementos=generaLista(grammar);
+
+		
+
+		 List<CompleteElementType> ListaElementos=generaLista(grammar);
 	        
 
 	        if (ListaElementos.size()>255)
@@ -389,9 +434,7 @@ public class CollectionOdAaXLS {
 	        	cL.getLogLines().add("Tamaño de estructura demasiado grande para exportar a xls para gramatica: " + grammar.getName() +" solo 255 estructuras seran grabadas, divide en gramaticas mas simples");
 	        	ListaElementos=ListaElementos.subList(0, 254);
 	        	}
-	        
-	        List<CompleteDocuments> ListaDocumentos=generaDocs(list,virtualObject);
-	      
+	
 	        if (ListaDocumentos.size()+2>65536)
 	    	{
 	    	cL.getLogLines().add("Tamaño de los objetos demasiado grande para exportar a xls solo se exportaran los 65534 primeros");
@@ -452,9 +495,301 @@ public class CollectionOdAaXLS {
 		        		if (j==0)
 		            		Value="Clavy Type Id ( DO NOT MODIFY THIS ROW )";
 		            	else 
-		            		if (j==1)
-		            			Value=" -- ";
-		            		else
+		            		{
+		            		CompleteElementType TmpEle = ListaElementos.get(j-1);
+		            		Value=Long.toString(TmpEle.getClavilenoid());
+		            		}
+		
+		            	
+		        		if (Value.length()>=32767)
+		            	{
+		            		cL.getLogLines().add("Tamaño de Texto en Valor del path del Tipo " + Value + " excesivo, no debe superar los 32767 caracteres, columna recortada");
+		            		Value.substring(0, 32766);
+		            	}
+		            		Cell celda = fila.createCell(j);
+		            	
+		            	celda.setCellValue(Value);
+		            
+		           }
+	        	}
+	        	
+			}	
+	        
+	        
+	        if (!soloEstructura)
+	        {
+	        /*Hacemos un ciclo para inicializar los valores de filas de celdas*/
+	        for(int f=0;f<ListaDocumentos.size();f++){
+	            /*La clase Row nos permitirá crear las filas*/
+	            Row fila = hoja.createRow(row);
+	            row++;
+
+	            CompleteDocuments Doc=ListaDocumentos.get(f);
+	            HashMap<Integer, ArrayList<CompleteElement>> ListaClave=new HashMap<Integer, ArrayList<CompleteElement>>();
+	            
+	            for (CompleteElement elem : Doc.getDescription()) {
+					Integer val=clave.get(elem.getHastype().getClavilenoid());
+					if (val!=null)
+						{
+						ArrayList<CompleteElement> Lis=ListaClave.get(val);
+						if (Lis==null)
+							{
+							Lis=new ArrayList<CompleteElement>();
+							}
+						Lis.add(elem);
+						ListaClave.put(val, Lis);
+						}
+				}
+	            
+	            
+	            
+	            /*Cada fila tendrá celdas de datos*/
+	            for(int c=0;c<columnsMax+1;c++){
+	            	
+	            	String Value = "";
+	            	if (c==0)
+	            		Value=Long.toString(Doc.getClavilenoid());
+	            	else
+	            		{
+	            		{
+		            		ArrayList<CompleteElement> temp = ListaClave.get(c-1);
+		            		if (temp!=null)
+		            		{
+		            			if (temp.size()>0){
+		            			CompleteElement completeElement=temp.get(0);
+		            			if (completeElement instanceof CompleteTextElement)
+			            			Value=(((CompleteTextElement)completeElement).getValue());
+								else if (completeElement instanceof CompleteLinkElement)
+			            			Value=Long.toString((((CompleteLinkElement)completeElement).getValue().getClavilenoid()));
+								else if (completeElement instanceof CompleteResourceElementURL)
+			            			Value=(((CompleteResourceElementURL)completeElement).getValue());
+								else if (completeElement instanceof CompleteResourceElementFile)
+			            			Value=(((CompleteResourceElementFile)completeElement).getValue().getPath());
+		            		}
+
+		            		
+		            		}
+		            		}
+	            		}
+	
+	            	 
+	            	if (Value.length()>=32767)
+	            	{
+	            		Value="";
+	            		cL.getLogLines().add("Tamaño de Texto en Valor en elemento " + Value + " excesivo, no debe superar los 32767 caracteres, columna recortada");
+	            		Value.substring(0, 32766);
+	            	}
+	                /*Creamos la celda a partir de la fila actual*/
+	                Cell celda = fila.createCell(c);               	
+	                		 celda.setCellValue(Value);
+	                    /*Si no es la primera fila establecemos un valor*/
+	                	//32.767
+
+	                
+	            	}
+
+	            		
+	            		
+	            }
+	        
+	        }
+	        
+	       
+		
+	}
+	
+	
+
+	/**
+	 * Para todo lo que no son los datos
+	 * @param hoja
+	 * @param grammar
+	 * @param clave
+	 * @param cL
+	 * @param list
+	 * @param soloEstructura
+	 * @param virtualObject
+	 */
+	private static void processRecursosLink(Sheet hoja, CompleteElementType grammar,
+			HashMap<Long, Integer> clave, CompleteCollectionLog cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura) {
+		  
+
+
+	
+		
+	        if (ListaDocumentos.size()+2>65536)
+	    	{
+	    	cL.getLogLines().add("Tamaño de los objetos demasiado grande para exportar a xls solo se exportaran los 65534 primeros");
+	    	ListaDocumentos=ListaDocumentos.subList(0, 65534);
+	    	}
+
+	        	
+	        int row=0;     	
+	        Row filaPrimera = hoja.createRow(row);
+        	row++;
+        	Cell celda0 = filaPrimera.createCell(0);
+        	celda0.setCellValue("Identificador del Documento");
+        	Cell celda1 = filaPrimera.createCell(1);
+        	celda1.setCellValue("Identificadorede de los archivos asociados al Documento ----------->");
+ 
+	        if (!soloEstructura)
+	        {
+	        /*Hacemos un ciclo para inicializar los valores de filas de celdas*/
+	        for(int f=0;f<ListaDocumentos.size();f++){
+	            /*La clase Row nos permitirá crear las filas*/
+	            Row fila = hoja.createRow(row);
+	            row++;
+
+	            CompleteDocuments Doc=ListaDocumentos.get(f);
+	            
+	            ArrayList<CompleteElement> Elementos=new ArrayList<CompleteElement>();
+	            for (CompleteElement elem : Doc.getDescription()) {
+	            	if (elem.getHastype().getClavilenoid().equals(grammar.getClavilenoid()))
+	            		Elementos.add(elem);
+				}
+	            
+	            
+	            
+	            
+	            /*Cada fila tendrá celdas de datos*/
+	            for(int c=0;c<=Elementos.size();c++){
+	            	
+	            	String Value = "";
+	            	if (c==0)
+	            		Value=Long.toString(Doc.getClavilenoid());
+	            	else
+	            		{
+	            		
+		            		CompleteElement completeElement = Elementos.get(c-1);
+		            		if (completeElement!=null)
+		            		{
+		            			if (completeElement instanceof CompleteTextElement)
+			            			Value=(((CompleteTextElement)completeElement).getValue());
+								else if (completeElement instanceof CompleteLinkElement)
+			            			Value=Long.toString((((CompleteLinkElement)completeElement).getValue().getClavilenoid()));
+								else if (completeElement instanceof CompleteResourceElementURL)
+			            			Value=(((CompleteResourceElementURL)completeElement).getValue());
+								else if (completeElement instanceof CompleteResourceElementFile)
+			            			Value=(((CompleteResourceElementFile)completeElement).getValue().getPath());
+		            		}
+
+		            		
+		            		}
+		            		
+	            		
+	
+	            	 
+	            	if (Value.length()>=32767)
+	            	{
+	            		Value="";
+	            		cL.getLogLines().add("Tamaño de Texto en Valor en elemento " + Value + " excesivo, no debe superar los 32767 caracteres, columna recortada");
+	            		Value.substring(0, 32766);
+	            	}
+	                /*Creamos la celda a partir de la fila actual*/
+	                Cell celda = fila.createCell(c);               	
+	                		 celda.setCellValue(Value);
+	                    /*Si no es la primera fila establecemos un valor*/
+	                	//32.767
+
+	                
+	            	}
+
+	            		
+	            		
+	            }
+	        
+	        }
+	        
+	       
+		
+	}
+	/**
+	 * Para todo los files
+	 * @param hoja
+	 * @param grammar
+	 * @param clave
+	 * @param cL
+	 * @param list
+	 * @param soloEstructura
+	 * @param virtualObject
+	 */
+	private static void processFiles(Sheet hoja, CompleteGrammar grammar,
+			HashMap<Long, Integer> clave, CompleteCollectionLog cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura) {
+		  
+	  
+	        
+		  
+			List<CompleteElementType> ListaElementos=new ArrayList<CompleteElementType>();
+			
+			CompleteElementType Filefisico=findFilesFisico(grammar.getSons());
+			CompleteElementType FileOwner=findOwner(grammar.getSons());
+
+			Filefisico.setName("Path");
+			FileOwner.setName("Identificador del dueño Objeto Virtual");
+			
+			ListaElementos.add(Filefisico);
+			ListaElementos.add(FileOwner);
+	      
+	        if (ListaDocumentos.size()+2>65536)
+	    	{
+	    	cL.getLogLines().add("Tamaño de los objetos demasiado grande para exportar a xls solo se exportaran los 65534 primeros");
+	    	ListaDocumentos=ListaDocumentos.subList(0, 65534);
+	    	}
+
+	        	
+	        int row=0;
+	        int Column=0;
+	        int columnsMax=ListaElementos.size();
+	       	
+	        
+	        for (int i = 0; i < 2; i++) {
+	        	Row fila = hoja.createRow(row);
+	        	row++;
+	        	
+	        	if (i==0)
+	        	{
+	        		for (int j = 0; j < columnsMax+1; j++) {
+		        		
+		        		String Value = "";
+		            	if (j==0)
+		            		Value="Clavy Document Id ( DO NOT MODIFY THIS COLUMN )";
+		            	else
+		            		{
+		            		CompleteElementType TmpEle = ListaElementos.get(j-1);
+		            		Value=TmpEle.getName();
+		            		}
+		
+		            	
+		            	if (Value.length()>=32767)
+		            	{
+		            		cL.getLogLines().add("Tamaño de Texto en Valor del path del Tipo " + Value + " excesivo, no debe superar los 32767 caracteres, columna recortada");
+		            		Value.substring(0, 32766);
+		            	}
+		            		Cell celda = fila.createCell(j);
+		            		
+		            		
+		            	if (j>0)
+		            		{
+		            		clave.put(ListaElementos.get(j-1).getClavilenoid(), Column);
+		            		Column++;
+		            		}
+		            	else
+		            	{
+		            		hoja.setColumnWidth(j, 12750);
+		            	}
+		            	
+		            	celda.setCellValue(Value);
+		            
+		           }
+	        	}
+	        	else if (i==1)
+	        	{
+	        		for (int j = 0; j < columnsMax+1; j++) {
+		        		
+		        		String Value = "";
+		        		if (j==0)
+		            		Value="Clavy Type Id ( DO NOT MODIFY THIS ROW )";
+		            	else 
 		            		{
 		            		CompleteElementType TmpEle = ListaElementos.get(j-1);
 		            		Value=Long.toString(TmpEle.getClavilenoid());
@@ -576,6 +911,7 @@ public class CollectionOdAaXLS {
 		
 	}
 	
+	
 	private static ArrayList<CompleteDocuments> generaDocs(
 			List<CompleteDocuments> list, CompleteGrammar grammar) {
 		ArrayList<CompleteDocuments> ListaDoc=new ArrayList<CompleteDocuments>();
@@ -608,6 +944,20 @@ public class CollectionOdAaXLS {
 			}
 		 return ListaElementos;
 	}
+	
+//	private static ArrayList<CompleteElementType> generaLista(
+//			CompleteGrammar completegramar) {
+//		 ArrayList<CompleteElementType> ListaElementos = new ArrayList<CompleteElementType>();
+//		 for (CompleteStructure completeelem : completegramar.getSons()) {
+//			 	if (completeelem instanceof CompleteElementType)
+//			 		{
+//			 		if (completeelem instanceof CompleteTextElementType||completeelem instanceof CompleteLinkElementType||completeelem instanceof CompleteResourceElementType)
+//			 			ListaElementos.add((CompleteElementType)completeelem);
+//			 		}
+//				ListaElementos.addAll(generaLista(completeelem));
+//			}
+//		 return ListaElementos;
+//	}
 
 	private static Collection<? extends CompleteElementType> generaLista(
 			CompleteStructure completeelementPadre) {
