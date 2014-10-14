@@ -164,29 +164,7 @@ public class StaticFuctionsOdAaXLS {
 		return false;
 	}
 	
-	/**
-	 * Revisa si un elemento es Recursos
-	 * @param hastype
-	 * @return
-	 */
-	public static boolean isRecursos(CompleteElementType hastype) {
-		
-		ArrayList<CompleteOperationalView> Shows = hastype.getShows();
-		for (CompleteOperationalView show : Shows) {
-			
-			if (show.getName().equals(StaticNamesOdAaXLS.META))
-			{
-				ArrayList<CompleteOperationalValueType> ShowValue = show.getValues();
-				for (CompleteOperationalValueType CompleteOperationalValueType : ShowValue) {
-					if (CompleteOperationalValueType.getName().equals(StaticNamesOdAaXLS.TYPE))
-						if (CompleteOperationalValueType.getDefault().equals(StaticNamesOdAaXLS.RECURSO)) 
-										return true;
-				}
-			}
-		}
-		return false;
-	}
-	
+
 	/**
 	 * Revisa si un elemento es Resources
 	 * @param hastype
@@ -204,6 +182,42 @@ public class StaticFuctionsOdAaXLS {
 					if (CompleteOperationalValueType.getName().equals(StaticNamesOdAaXLS.TYPE))
 						if (CompleteOperationalValueType.getDefault().equals(StaticNamesOdAaXLS.RESOURCE)) 
 										return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public static boolean isURL(CompleteGrammar completeGrammar) {
+		ArrayList<CompleteOperationalView> Shows = completeGrammar.getViews();
+		for (CompleteOperationalView show : Shows) {
+			
+			if (show.getName().equals(StaticNamesOdAaXLS.META))
+			{
+				ArrayList<CompleteOperationalValueType> ShowValue = show.getValues();
+				for (CompleteOperationalValueType CompleteOperationalValueType : ShowValue) {
+					if (CompleteOperationalValueType.getName().equals(StaticNamesOdAaXLS.TYPE))
+						if (CompleteOperationalValueType.getDefault().equals(StaticNamesOdAaXLS.URL)) 
+										return true;
+
+				}
+			}
+		}
+		return false;
+	}
+
+	public static boolean isURI(CompleteElementType completeStructure) {
+		ArrayList<CompleteOperationalView> Shows = completeStructure.getShows();
+		for (CompleteOperationalView show : Shows) {
+			
+			if (show.getName().equals(StaticNamesOdAaXLS.META))
+			{
+				ArrayList<CompleteOperationalValueType> ShowValue = show.getValues();
+				for (CompleteOperationalValueType CompleteOperationalValueType : ShowValue) {
+					if (CompleteOperationalValueType.getName().equals(StaticNamesOdAaXLS.TYPE))
+						if (CompleteOperationalValueType.getDefault().equals(StaticNamesOdAaXLS.URI)) 
+										return true;
+
 				}
 			}
 		}

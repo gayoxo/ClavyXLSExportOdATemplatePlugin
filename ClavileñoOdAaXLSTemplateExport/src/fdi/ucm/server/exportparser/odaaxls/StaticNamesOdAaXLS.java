@@ -13,12 +13,14 @@ public class StaticNamesOdAaXLS {
 	public static final String VIRTUAL_OBJECT = "Virtual Object";
 	public static final String DATOS = "Datos";
 	public static final String METADATOS = "Metadatos";
-	public static final String RECURSO = "Recursos";
 	
 
 	public static final String FILE = "File";
 	public static final String FILERESOURCE = "File Resource";
 	public static final String RESOURCE = "Resource";
 	public static final String IDOV_OWNER = "Idov Owner";
+	
+	public static final String URL = "URL";
+	public static final String URI = "URI";
 	
 }
