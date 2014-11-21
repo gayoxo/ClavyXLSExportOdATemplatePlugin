@@ -114,8 +114,7 @@ public class CollectionOdAaXLS {
         	 
         	 List<CompleteDocuments> ListaDocumentos=generaDocs(salvar.getEstructuras(),VirtualObject);
         	 
-        	 if (Datos!=null)
-        		 processDatos(HojaD,Datos,clave,cL,ListaDocumentos,soloEstructura);
+        		 processDatos(HojaD,Datos,clave,cL,ListaDocumentos,soloEstructura,VirtualObject.getClavilenoid());
         		 
         	 
         	 if (MetaDatos!=null)
@@ -260,14 +259,18 @@ public class CollectionOdAaXLS {
 	 * @param cL
 	 * @param list
 	 * @param soloEstructura
+	 * @param gramarId 
 	 * @param virtualObject
 	 */
 	private static void processDatos(Sheet hoja, CompleteElementType grammar,
-			HashMap<Long, Integer> clave, CompleteCollectionLog cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura) {
+			HashMap<Long, Integer> clave, CompleteCollectionLog cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura, Long gramarId) {
 		  
 	  
+		List<CompleteElementType> ListaElementos;
 	        
-	        List<CompleteElementType> ListaElementos=generaLista(grammar);
+		if (grammar!=null)
+	        ListaElementos=generaLista(grammar);
+		else ListaElementos=new ArrayList<CompleteElementType>();
 	        
 
 	        if (ListaElementos.size()>255)
@@ -342,7 +345,7 @@ public class CollectionOdAaXLS {
 		            		Value="Clavy Type Id ( DO NOT MODIFY THIS ROW )";
 		            	else 
 		            		if (j==1)
-		            			Value="--";
+		            			Value=Long.toString(gramarId);
 		            		else
 		            		{
 		            		CompleteElementType TmpEle = ListaElementos.get(j-2);
@@ -365,7 +368,7 @@ public class CollectionOdAaXLS {
 			}	
 	        
 	        
-	        if (!soloEstructura)
+	        if (!soloEstructura&&ListaElementos.size()>0)
 	        {
 	        /*Hacemos un ciclo para inicializar los valores de filas de celdas*/
 	        for(int f=0;f<ListaDocumentos.size();f++){
@@ -1007,14 +1010,16 @@ public class CollectionOdAaXLS {
 	        	
 	        	if (i==0)
 	        	{
-	        		for (int j = 0; j < columnsMax+1; j++) {
+	        		for (int j = 0; j < columnsMax+2; j++) {
 		        		
 		        		String Value = "";
 		            	if (j==0)
 		            		Value="Clavy Document Id ( DO NOT MODIFY THIS COLUMN )";
+		            	else if (j==1)
+		            		Value="Description";
 		            	else
 		            		{
-		            		CompleteElementType TmpEle = ListaElementos.get(j-1);
+		            		CompleteElementType TmpEle = ListaElementos.get(j-2);
 		            		Value=TmpEle.getName();
 		            		}
 		
@@ -1027,9 +1032,9 @@ public class CollectionOdAaXLS {
 		            		Cell celda = fila.createCell(j);
 		            		
 		            		
-		            	if (j>0)
+		            	if (j>1)
 		            		{
-		            		clave.put(ListaElementos.get(j-1).getClavilenoid(), Column);
+		            		clave.put(ListaElementos.get(j-2).getClavilenoid(), Column);
 		            		Column++;
 		            		}
 		            	else
@@ -1043,14 +1048,16 @@ public class CollectionOdAaXLS {
 	        	}
 	        	else if (i==1)
 	        	{
-	        		for (int j = 0; j < columnsMax+1; j++) {
+	        		for (int j = 0; j < columnsMax+2; j++) {
 		        		
 		        		String Value = "";
 		        		if (j==0)
 		            		Value="Clavy Type Id ( DO NOT MODIFY THIS ROW )";
+		        		else if (j==1)
+		            		Value=Long.toString(grammar.getClavilenoid());
 		            	else 
 		            		{
-		            		CompleteElementType TmpEle = ListaElementos.get(j-1);
+		            		CompleteElementType TmpEle = ListaElementos.get(j-2);
 		            		Value=Long.toString(TmpEle.getClavilenoid());
 		            		}
 		
@@ -1098,15 +1105,17 @@ public class CollectionOdAaXLS {
 	            
 	            
 	            /*Cada fila tendrá celdas de datos*/
-	            for(int c=0;c<columnsMax+1;c++){
+	            for(int c=0;c<columnsMax+2;c++){
 	            	
 	            	String Value = "";
 	            	if (c==0)
 	            		Value=Long.toString(Doc.getClavilenoid());
+	            	else if (c==2)
+	            		Value=Doc.getDescriptionText();
 	            	else
 	            		{
 	            		{
-		            		ArrayList<CompleteElement> temp = ListaClave.get(c-1);
+		            		ArrayList<CompleteElement> temp = ListaClave.get(c-2);
 		            		if (temp!=null)
 		            		{
 		            		if (temp.size()>0){
@@ -1187,14 +1196,16 @@ public class CollectionOdAaXLS {
 	        	
 	        	if (i==0)
 	        	{
-	        		for (int j = 0; j < columnsMax+1; j++) {
+	        		for (int j = 0; j < columnsMax+2; j++) {
 		        		
 		        		String Value = "";
 		            	if (j==0)
 		            		Value="Clavy Document Id ( DO NOT MODIFY THIS COLUMN )";
+		            	else if (j==1)
+		            		Value="Description";
 		            	else
 		            		{
-		            		CompleteElementType TmpEle = ListaElementos.get(j-1);
+		            		CompleteElementType TmpEle = ListaElementos.get(j-2);
 		            		Value=TmpEle.getName();
 		            		}
 		
@@ -1207,9 +1218,9 @@ public class CollectionOdAaXLS {
 		            		Cell celda = fila.createCell(j);
 		            		
 		            		
-		            	if (j>0)
+		            	if (j>1)
 		            		{
-		            		clave.put(ListaElementos.get(j-1).getClavilenoid(), Column);
+		            		clave.put(ListaElementos.get(j-2).getClavilenoid(), Column);
 		            		Column++;
 		            		}
 		            	else
@@ -1223,14 +1234,16 @@ public class CollectionOdAaXLS {
 	        	}
 	        	else if (i==1)
 	        	{
-	        		for (int j = 0; j < columnsMax+1; j++) {
+	        		for (int j = 0; j < columnsMax+2; j++) {
 		        		
 		        		String Value = "";
 		        		if (j==0)
 		            		Value="Clavy Type Id ( DO NOT MODIFY THIS ROW )";
+		        		else if (j==1)
+		            		Value=Long.toString(grammar.getClavilenoid());
 		            	else 
 		            		{
-		            		CompleteElementType TmpEle = ListaElementos.get(j-1);
+		            		CompleteElementType TmpEle = ListaElementos.get(j-2);
 		            		Value=Long.toString(TmpEle.getClavilenoid());
 		            		}
 		
@@ -1278,15 +1291,17 @@ public class CollectionOdAaXLS {
 	            
 	            
 	            /*Cada fila tendrá celdas de datos*/
-	            for(int c=0;c<columnsMax+1;c++){
+	            for(int c=0;c<columnsMax+2;c++){
 	            	
 	            	String Value = "";
 	            	if (c==0)
 	            		Value=Long.toString(Doc.getClavilenoid());
+	            	else if (c==1)
+	            		Value=Doc.getDescriptionText();
 	            	else
 	            		{
 	            		{
-		            		ArrayList<CompleteElement> temp = ListaClave.get(c-1);
+		            		ArrayList<CompleteElement> temp = ListaClave.get(c-2);
 		            		if (temp!=null)
 		            		{
 		            			if (temp.size()>0){
