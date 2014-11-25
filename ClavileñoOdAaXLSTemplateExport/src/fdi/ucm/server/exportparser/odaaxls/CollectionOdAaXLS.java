@@ -44,6 +44,8 @@ import fdi.ucm.server.modelComplete.collection.grammar.CompleteTextElementType;
 public class CollectionOdAaXLS {
 
 
+	
+
 	public static String processCompleteCollection(CompleteCollectionLog cL,
 			CompleteCollection salvar, boolean soloEstructura, String pathTemporalFiles) throws IOException {
 		
@@ -70,11 +72,11 @@ public class CollectionOdAaXLS {
         
        
         
-        Sheet HojaD = libro.createSheet("Datos");
-	   	Sheet HojaM =libro.createSheet("MetaDatos");
-	   	Sheet HojaR =libro.createSheet("Recursos");
-	   	Sheet HojaF =libro.createSheet("Archivos");
-	   	Sheet HojaU =libro.createSheet("URLs");
+        Sheet HojaD = libro.createSheet(NameConstantsOdAaXLS.DATOS);
+	   	Sheet HojaM =libro.createSheet(NameConstantsOdAaXLS.META_DATOS);
+	   	Sheet HojaR =libro.createSheet(NameConstantsOdAaXLS.RECURSOS2);
+	   	Sheet HojaF =libro.createSheet(NameConstantsOdAaXLS.ARCHIVOS);
+	   	Sheet HojaU =libro.createSheet(NameConstantsOdAaXLS.UR_LS);
 //	   	Sheet HojaFUR =libro.createSheet("Relacion Recursos");
        
 	   	CompleteGrammar Files=findFiles(salvar.getMetamodelGrammar());
