@@ -1112,7 +1112,7 @@ public class CollectionOdAaXLS {
 	            	String Value = "";
 	            	if (c==0)
 	            		Value=Long.toString(Doc.getClavilenoid());
-	            	else if (c==2)
+	            	else if (c==1)
 	            		Value=Doc.getDescriptionText();
 	            	else
 	            		{
