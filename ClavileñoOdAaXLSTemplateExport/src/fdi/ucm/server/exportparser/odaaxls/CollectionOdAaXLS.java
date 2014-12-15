@@ -33,8 +33,6 @@ import fdi.ucm.server.modelComplete.collection.grammar.CompleteElementType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteGrammar;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteIterator;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteLinkElementType;
-import fdi.ucm.server.modelComplete.collection.grammar.CompleteOperationalValueType;
-import fdi.ucm.server.modelComplete.collection.grammar.CompleteOperationalView;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteResourceElementType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteStructure;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteTextElementType;
@@ -281,7 +279,7 @@ public class CollectionOdAaXLS {
 
 			for (CompleteElementType completeElementType : ListaElementos) {
 			
-				if (completeElementType instanceof CompleteTextElementType && isIDOV((CompleteTextElementType)completeElementType))
+				if (completeElementType instanceof CompleteTextElementType && StaticFuctionsOdAaXLS.isIDOV((CompleteTextElementType)completeElementType))
 					IDOV=(CompleteTextElementType)completeElementType;
 			}
 		
@@ -367,7 +365,7 @@ public class CollectionOdAaXLS {
 		            		{
 		            		CompleteElementType TmpEle = ListaElementos.get(j-2);
 		            		
-		            		Integer I=getIDODAD(TmpEle);
+		            		Integer I=StaticFuctionsOdAaXLS.getIDODAD(TmpEle);
 		            		
 		            		if (I!=null)
 		            			Value=Integer.toString(I);
@@ -407,7 +405,7 @@ public class CollectionOdAaXLS {
 	            for (CompleteElement elem : Doc.getDescription()) {
 					Integer val=clave.get(elem.getHastype().getClavilenoid());
 					
-					if (val==null&&elem instanceof CompleteTextElement && elem.getHastype() instanceof CompleteTextElementType &&isIDOV((CompleteTextElementType)elem.getHastype()))
+					if (val==null&&elem instanceof CompleteTextElement && elem.getHastype() instanceof CompleteTextElementType &&StaticFuctionsOdAaXLS.isIDOV((CompleteTextElementType)elem.getHastype()))
 						DocID=((CompleteTextElement)elem).getValue();
 					
 
@@ -567,7 +565,7 @@ public class CollectionOdAaXLS {
 		            		{
 		            		CompleteElementType TmpEle = ListaElementos.get(j-1);
 
-		            		Integer I=getIDODAD(TmpEle);
+		            		Integer I=StaticFuctionsOdAaXLS.getIDODAD(TmpEle);
 		            		
 		            		if (I!=null)
 		            			Value=Integer.toString(I);
@@ -607,7 +605,7 @@ public class CollectionOdAaXLS {
 				for (CompleteElement elem : Doc.getDescription()) {
 					Integer val=clave.get(elem.getHastype().getClavilenoid());
 					
-					if (val==null&&elem instanceof CompleteTextElement && elem.getHastype() instanceof CompleteTextElementType &&isIDOV((CompleteTextElementType)elem.getHastype()))
+					if (val==null&&elem instanceof CompleteTextElement && elem.getHastype() instanceof CompleteTextElementType &&StaticFuctionsOdAaXLS.isIDOV((CompleteTextElementType)elem.getHastype()))
 						DocID=((CompleteTextElement)elem).getValue();
 					
 					if (val!=null)
@@ -773,7 +771,7 @@ public class CollectionOdAaXLS {
 		            		{
 		            		CompleteElementType TmpEle = ListaElementos.get(j-2);
 
-		            		Integer I=getIDODAD(TmpEle);
+		            		Integer I=StaticFuctionsOdAaXLS.getIDODAD(TmpEle);
 		            		
 		            		if (I!=null)
 		            			Value=Integer.toString(I);
@@ -817,7 +815,7 @@ public class CollectionOdAaXLS {
 	            for (CompleteElement elem : Doc.getDescription()) {
 					Integer val=clave.get(elem.getHastype().getClavilenoid());
 					
-					if (val==null&&elem instanceof CompleteTextElement && elem.getHastype() instanceof CompleteTextElementType &&isIDOV((CompleteTextElementType)elem.getHastype()))
+					if (val==null&&elem instanceof CompleteTextElement && elem.getHastype() instanceof CompleteTextElementType &&StaticFuctionsOdAaXLS.isIDOV((CompleteTextElementType)elem.getHastype()))
 						DocID=((CompleteTextElement)elem).getValue();
 						
 					
@@ -838,7 +836,7 @@ public class CollectionOdAaXLS {
 						{
 							String DocID2=null;
 							for (CompleteElement elem2 : ((CompleteLinkElement) elem).getValue().getDescription()) {	
-								if (elem2 instanceof CompleteTextElement && elem2.getHastype() instanceof CompleteTextElementType &&isIDOV((CompleteTextElementType)elem2.getHastype()))
+								if (elem2 instanceof CompleteTextElement && elem2.getHastype() instanceof CompleteTextElementType &&StaticFuctionsOdAaXLS.isIDOV((CompleteTextElementType)elem2.getHastype()))
 										DocID2=((CompleteTextElement)elem2).getValue();
 												
 							}
@@ -1157,7 +1155,7 @@ public class CollectionOdAaXLS {
 		            		{
 		            		CompleteElementType TmpEle = ListaElementos.get(j-2);
 		            		
-		            		Integer I=getIDODAD(TmpEle);
+		            		Integer I=StaticFuctionsOdAaXLS.getIDODAD(TmpEle);
 		            		
 		            		if (I!=null)
 		            			Value=Integer.toString(I);
@@ -1349,7 +1347,7 @@ public class CollectionOdAaXLS {
 		            		{
 		            		CompleteElementType TmpEle = ListaElementos.get(j-2);
 		            		
-		            		Integer I=getIDODAD(TmpEle);
+		            		Integer I=StaticFuctionsOdAaXLS.getIDODAD(TmpEle);
 		            		
 		            		if (I!=null)
 		            			Value=Integer.toString(I);
@@ -1512,47 +1510,7 @@ public class CollectionOdAaXLS {
 		 return ListaElementos;
 	}
 	
-	public static Integer getIDODAD(CompleteElementType attribute) {
-		ArrayList<CompleteOperationalView> Shows = attribute.getShows();
-		for (CompleteOperationalView show : Shows) {
-			
-			if (show.getName().equals(StaticNamesOdAaXLS.PRESNTACION))
-			{
-				ArrayList<CompleteOperationalValueType> ShowValue = show.getValues();
-				for (CompleteOperationalValueType CompleteOperationalValueType : ShowValue) {
-					if (CompleteOperationalValueType.getName().equals(StaticNamesOdAaXLS.OdaID))
-						try {
-							Integer I=Integer.parseInt(CompleteOperationalValueType.getDefault());
-								return I;
-						} catch (Exception e) {
-							return null;
-						}
-						
-
-				}
-			}
-		}
-		return null;
-		
-	}
 	
-	public static boolean isIDOV(CompleteTextElementType hastype) {
-		ArrayList<CompleteOperationalView> Shows = hastype.getShows();
-		for (CompleteOperationalView show : Shows) {
-			
-			if (show.getName().equals(StaticNamesOdAaXLS.META))
-			{
-				ArrayList<CompleteOperationalValueType> ShowValue = show.getValues();
-				for (CompleteOperationalValueType CompleteOperationalValueType : ShowValue) {
-					if (CompleteOperationalValueType.getName().equals(StaticNamesOdAaXLS.TYPE))
-						if (CompleteOperationalValueType.getDefault().equals(StaticNamesOdAaXLS.IDOV)) 
-										return true;
-
-				}
-			}
-		}
-		return false;
-	}
 	
 
 	public static void main(String[] args) throws Exception{
