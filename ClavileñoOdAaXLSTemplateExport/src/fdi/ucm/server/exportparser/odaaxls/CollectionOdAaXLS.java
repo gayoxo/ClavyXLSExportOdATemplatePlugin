@@ -77,61 +77,87 @@ public class CollectionOdAaXLS {
 	   	Sheet HojaR =libro.createSheet(NameConstantsOdAaXLS.RECURSOS2);
 	   	Sheet HojaF =libro.createSheet(NameConstantsOdAaXLS.ARCHIVOS);
 	   	Sheet HojaU =libro.createSheet(NameConstantsOdAaXLS.UR_LS);
-//	   	Sheet HojaFUR =libro.createSheet("Relacion Recursos");
        
+	   	
+	   	//Files
+	   	List<CompleteDocuments> ListaDocumentosF=new ArrayList<CompleteDocuments>();
 	   	CompleteGrammar Files=findFiles(salvar.getMetamodelGrammar());
-	    if (Files!=null)
-        {
-	    		List<CompleteDocuments> ListaDocumentos=generaDocs(salvar.getEstructuras(),Files);
-	    		processFiles(HojaF,Files,clave,cL,ListaDocumentos,soloEstructura);
+	   	if (Files==null)
+	   	{
+	   		cL.getLogLines().add("No posee Files");
+	   		Files=new CompleteGrammar("generada", "Generada", salvar);
+	   		
+	   	}else
+	   		ListaDocumentosF=generaDocs(salvar.getEstructuras(),Files);
+	   	
+	    
+	    processFiles(HojaF,Files,clave,cL,ListaDocumentosF,soloEstructura);
         		 
         	 
 
 
-        }
-        else
-        	cL.getLogLines().add("No posee Files");
+      
+	    List<CompleteDocuments> ListaDocumentosU=new ArrayList<CompleteDocuments>();	
 	   	
 	    CompleteGrammar URLS=findURLs(salvar.getMetamodelGrammar());
-	    if (URLS!=null)
+	    if (URLS==null)
         {
-	    		List<CompleteDocuments> ListaDocumentos=generaDocs(salvar.getEstructuras(),URLS);
-	    		processURls(HojaU,URLS,clave,cL,ListaDocumentos,soloEstructura);
+	    	cL.getLogLines().add("No posee URLs");
+	    	URLS=new CompleteGrammar("generada", "Generada", salvar);
+        }
+	    else
+	    	ListaDocumentosU=generaDocs(salvar.getEstructuras(),URLS);
+	    
+	    processURls(HojaU,URLS,clave,cL,ListaDocumentosU,soloEstructura);
         		 
         	 
 
 
-        }
-        else
-        	cL.getLogLines().add("No posee URLs");
+        
+
 	    
 	   	
 	    CompleteGrammar VirtualObject=findVO(salvar.getMetamodelGrammar());
-        if (VirtualObject!=null)
+	    List<CompleteDocuments> ListaDocumentosOV=new ArrayList<CompleteDocuments>();
+        if (VirtualObject==null)
         {
+        	cL.getLogLines().add("No posee un Objeto Virtual");
+        	VirtualObject=new CompleteGrammar("generada", "Generada", salvar);
+        }
+        else 
+        	ListaDocumentosOV=generaDocs(salvar.getEstructuras(),VirtualObject);
+        
         	 CompleteElementType Datos=findDatos(VirtualObject.getSons());
         	 CompleteElementType MetaDatos=findMetaDatos(VirtualObject.getSons());
         	 CompleteElementType Recursos=findResources(VirtualObject.getSons());
 //        	 CompleteElementType RecursosLink=findResourcesLink(VirtualObject.getSons());
         	 
-        	 List<CompleteDocuments> ListaDocumentos=generaDocs(salvar.getEstructuras(),VirtualObject);
+        	 if (Datos==null)
+ 			{
+ 			cL.getLogLines().add("No posee Datos");
+ 			Datos=new CompleteElementType();
+ 			Datos.setClavilenoid(-1l);
+ 			}
+        	 if (MetaDatos==null)
+ 			{
+ 			cL.getLogLines().add("No posee Metadatos");
+ 			MetaDatos=new CompleteElementType();
+ 			MetaDatos.setClavilenoid(-2l);
+ 			}
+        	 if (Recursos==null)
+ 			{
+ 			cL.getLogLines().add("No posee Recursos");
+ 			Recursos=new CompleteElementType();
+ 			Recursos.setClavilenoid(-3l);
+ 			}
         	 
-        		 processDatos(HojaD,Datos,clave,cL,ListaDocumentos,soloEstructura,VirtualObject.getClavilenoid());
-        		 
-        	 
-        	 if (MetaDatos!=null)
-        		 processMetadatos(HojaM,MetaDatos,clave,cL,ListaDocumentos,soloEstructura);
+        		 processDatos(HojaD,Datos,clave,cL,ListaDocumentosOV,soloEstructura,VirtualObject.getClavilenoid());
+        		 processMetadatos(HojaM,MetaDatos,clave,cL,ListaDocumentosOV,soloEstructura);
+        		 processRecursos(HojaR,Recursos,clave,cL,ListaDocumentosOV,soloEstructura);
+        	
 
-        	 
-        	 if (Recursos!=null)
-        		 processRecursos(HojaR,Recursos,clave,cL,ListaDocumentos,soloEstructura);
-        	 
-//        	 if (RecursosLink!=null)
-//        		 processRecursosLink(HojaFUR,RecursosLink,clave,cL,ListaDocumentos,soloEstructura);
 
-        }
-        else
-        	cL.getLogLines().add("No posee un Objeto Virtual");
+        	
 			
         
         
@@ -186,22 +212,6 @@ public class CollectionOdAaXLS {
 		  
 			return null;
 	}
-	  
-//	  private static CompleteElementType findResourcesLink(List<CompleteStructure> sons) {
-//		  for (CompleteStructure completeStruct : sons) {
-//			  	if (completeStruct instanceof CompleteIterator)
-//			  		{
-//			  		CompleteElementType TMP=findResourcesLink(completeStruct.getSons());
-//			  		if (TMP!=null)
-//			  			return TMP;
-//			  		}
-//			  	else if (completeStruct instanceof CompleteElementType && StaticFuctionsOdAaXLS.isResources((CompleteElementType)completeStruct))
-//			  		return (CompleteElementType)completeStruct;
-//			}
-//			return null;
-//	}
-	  
-	  
 	 
 
 	private static CompleteGrammar findVO(List<CompleteGrammar> metamodelGrammar) {
@@ -318,10 +328,10 @@ public class CollectionOdAaXLS {
 		        		
 		        		String Value = "";
 		            	if (j==0)
-		            		Value="Clavy Document Id ( DO NOT MODIFY THIS COLUMN )";
+		            		Value="Id Objeto Virtual ( USAR NUMEROS NEGATIVOS PARA AÑADIR NUEVOS ELEMENTOS )";
 		            	else 
 		            		if (j==1)
-		            			Value="Description";
+		            			Value="Descripción";
 		            		else
 		            		{
 		            		CompleteElementType TmpEle = ListaElementos.get(j-2);
@@ -357,10 +367,10 @@ public class CollectionOdAaXLS {
 		        		
 		        		String Value = "";
 		        		if (j==0)
-		            		Value="Clavy Type Id ( DO NOT MODIFY THIS ROW )";
+		            		Value="Identificador tipo( NO MODIFICAR )";
 		            	else 
 		            		if (j==1)
-		            			Value=Long.toString(gramarId);
+		            			Value="--";
 		            		else
 		            		{
 		            		CompleteElementType TmpEle = ListaElementos.get(j-2);
@@ -524,7 +534,7 @@ public class CollectionOdAaXLS {
 		        		
 		        		String Value = "";
 		            	if (j==0)
-		            		Value="Clavy Document Id ( DO NOT MODIFY THIS COLUMN )";
+		            		Value="Identificador Objeto Virtual";
 		            	else
 		            		{
 		            		CompleteElementType TmpEle = ListaElementos.get(j-1);
@@ -560,7 +570,7 @@ public class CollectionOdAaXLS {
 		        		
 		        		String Value = "";
 		        		if (j==0)
-		            		Value="Clavy Type Id ( DO NOT MODIFY THIS ROW )";
+		            		Value="Identificador tipo( NO MODIFICAR )";
 		            	else 
 		            		{
 		            		CompleteElementType TmpEle = ListaElementos.get(j-1);
@@ -726,9 +736,9 @@ public class CollectionOdAaXLS {
 		        		
 		        		String Value = "";
 		            	if (j==0)
-		            		Value="Clavy Document Id Owner( DO NOT MODIFY THIS COLUMN )";
+		            		Value=" Identificador Objeto Virtual dueño";
 		            	else if (j==1)
-		            		Value="Clavy Document/File/Url Resource Id ( DO NOT MODIFY THIS COLUMN )";
+		            		Value="Identificador referencia (Identificador del Objeto Virtual en Datos/Metadatos, de los recursos en Archivos/Url)";
 		            	else
 		            		{
 		            		CompleteElementType TmpEle = ListaElementos.get(j-2);
@@ -764,7 +774,7 @@ public class CollectionOdAaXLS {
 		        		
 		        		String Value = "";
 		        		if (j==0)
-		            		Value="Clavy Type Id ( DO NOT MODIFY THIS ROW )";
+		            		Value="Identificador tipo( NO MODIFICAR )";
 		        		else if (j==1)
 		            		Value=Long.toString(grammar.getClavilenoid());
 		            	else 
@@ -957,108 +967,6 @@ public class CollectionOdAaXLS {
 	
 	
 
-//	/**
-//	 * Para todo lo que no son los datos
-//	 * @param hoja
-//	 * @param grammar
-//	 * @param clave
-//	 * @param cL
-//	 * @param list
-//	 * @param soloEstructura
-//	 * @param virtualObject
-//	 */
-//	private static void processRecursosLink(Sheet hoja, CompleteElementType grammar,
-//			HashMap<Long, Integer> clave, CompleteCollectionLog cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura) {
-//		  
-//
-//
-//	
-//		
-//	        if (ListaDocumentos.size()+2>65536)
-//	    	{
-//	    	cL.getLogLines().add("Tamaño de los objetos demasiado grande para exportar a xls solo se exportaran los 65534 primeros");
-//	    	ListaDocumentos=ListaDocumentos.subList(0, 65534);
-//	    	}
-//
-//	        	
-//	        int row=0;     	
-//	        Row filaPrimera = hoja.createRow(row);
-//        	row++;
-//        	Cell celda0 = filaPrimera.createCell(0);
-//        	celda0.setCellValue("Identificador del Documento");
-//        	Cell celda1 = filaPrimera.createCell(1);
-//        	celda1.setCellValue("Identificadorede de las URLs/Archivos/Documentos asociados al Documento ----------->");
-//        	
-//        	
-//    		hoja.setColumnWidth(0, 12750);
-//
-//    	 
-//        	
-// 
-//	        if (!soloEstructura)
-//	        {
-//	        /*Hacemos un ciclo para inicializar los valores de filas de celdas*/
-//	        for(int f=0;f<ListaDocumentos.size();f++){
-//	            /*La clase Row nos permitirá crear las filas*/
-//	            Row fila = hoja.createRow(row);
-//	            row++;
-//
-//	            CompleteDocuments Doc=ListaDocumentos.get(f);
-//	            
-//	            ArrayList<CompleteElement> Elementos=new ArrayList<CompleteElement>();
-//	            for (CompleteElement elem : Doc.getDescription()) {
-//	            	if (elem.getHastype().getClavilenoid().equals(grammar.getClavilenoid()))
-//	            		Elementos.add(elem);
-//				}
-//	            
-//	            
-//	            
-//	            
-//	            /*Cada fila tendrá celdas de datos*/
-//	            for(int c=0;c<=Elementos.size();c++){
-//	            	
-//	            	String Value = "";
-//	            	if (c==0)
-//	            		Value=Long.toString(Doc.getClavilenoid());
-//	            	else
-//	            		{
-//	            		
-//		            		CompleteElement completeElement = Elementos.get(c-1);
-//		            		if (completeElement!=null)
-//		            		{
-//		            			Value=getValueFromElement(completeElement);
-//		            		}
-//
-//		            		
-//		            		}
-//		            		
-//	            		
-//	            	
-//	            	
-//	            	if (Value.length()>=32767)
-//	            	{
-//	            		Value="";
-//	            		cL.getLogLines().add("Tamaño de Texto en Valor en elemento " + Value + " excesivo, no debe superar los 32767 caracteres, columna recortada");
-//	            		Value.substring(0, 32766);
-//	            	}
-//	                /*Creamos la celda a partir de la fila actual*/
-//	                Cell celda = fila.createCell(c);               	
-//	                		 celda.setCellValue(Value);
-//	                    /*Si no es la primera fila establecemos un valor*/
-//	                	//32.767
-//
-//	                
-//	            	}
-//
-//	            		
-//	            		
-//	            }
-//	        
-//	        }
-//	        
-//	       
-//		
-//	}
 	
 	
 	/**
@@ -1082,11 +990,30 @@ public class CollectionOdAaXLS {
 			CompleteElementType Filefisico=findFilesFisico(grammar.getSons());
 			CompleteElementType FileOwner=findOwner(grammar.getSons());
 
-			Filefisico.setName("Path");
-			FileOwner.setName("Identificador del dueño Objeto Virtual");
 			
-			ListaElementos.add(Filefisico);
+			if (Filefisico==null)
+				{
+				cL.getLogLines().add("No posee Path de los archivos");
+				Filefisico=new CompleteElementType();
+				Filefisico.setClavilenoid(-1l);
+				}
+			
+			if (FileOwner==null)
+			{
+				cL.getLogLines().add("No posee dueño de los archivos");
+				FileOwner=new CompleteElementType();
+				FileOwner.setClavilenoid(-2l);
+			}
+			
+			
+			Filefisico.setName("Path archivo");
+			FileOwner.setName("Identificador del Objeto Virtual dueño");
+			
 			ListaElementos.add(FileOwner);
+			ListaElementos.add(Filefisico);
+			
+			
+			
 	      
 	        if (ListaDocumentos.size()+2>65536)
 	    	{
@@ -1099,20 +1026,20 @@ public class CollectionOdAaXLS {
 	        int Column=0;
 	        int columnsMax=ListaElementos.size();
 	       	
+	        {
 	        
-	        for (int i = 0; i < 2; i++) {
+
 	        	Row fila = hoja.createRow(row);
 	        	row++;
+
 	        	
-	        	if (i==0)
-	        	{
 	        		for (int j = 0; j < columnsMax+2; j++) {
 		        		
 		        		String Value = "";
 		            	if (j==0)
-		            		Value="Clavy Document Id ( DO NOT MODIFY THIS COLUMN )";
+		            		Value="Identificador archivo";
 		            	else if (j==1)
-		            		Value="Description";
+		            		Value="Descripción";
 		            	else
 		            		{
 		            		CompleteElementType TmpEle = ListaElementos.get(j-2);
@@ -1142,41 +1069,7 @@ public class CollectionOdAaXLS {
 		            
 		           }
 	        	}
-	        	else if (i==1)
-	        	{
-	        		for (int j = 0; j < columnsMax+2; j++) {
-		        		
-		        		String Value = "";
-		        		if (j==0)
-		            		Value="Clavy Type Id ( DO NOT MODIFY THIS ROW )";
-		        		else if (j==1)
-		            		Value=Long.toString(grammar.getClavilenoid());
-		            	else 
-		            		{
-		            		CompleteElementType TmpEle = ListaElementos.get(j-2);
-		            		
-		            		Integer I=StaticFuctionsOdAaXLS.getIDODAD(TmpEle);
-		            		
-		            		if (I!=null)
-		            			Value=Integer.toString(I);
-		            		else
-		            			Value="#"+Long.toString(TmpEle.getClavilenoid());
-		            		}
-		
-		            	
-		        		if (Value.length()>=32767)
-		            	{
-		            		cL.getLogLines().add("Tamaño de Texto en Valor del path del Tipo " + Value + " excesivo, no debe superar los 32767 caracteres, columna recortada");
-		            		Value.substring(0, 32766);
-		            	}
-		            		Cell celda = fila.createCell(j);
-		            	
-		            	celda.setCellValue(Value);
-		            
-		           }
-	        	}
-	        	
-			}	
+
 	        
 	        
 	        if (!soloEstructura)
@@ -1211,7 +1104,7 @@ public class CollectionOdAaXLS {
 	            	
 	            	String Value = "";
 	            	if (c==0)
-	            		Value=Long.toString(Doc.getClavilenoid());
+	            		Value="#"+Long.toString(Doc.getClavilenoid());
 	            	else if (c==1)
 	            		Value=Doc.getDescriptionText();
 	            	else
@@ -1276,7 +1169,14 @@ public class CollectionOdAaXLS {
 			
 			CompleteElementType URi=findURI(grammar.getSons());
 
-			URi.setName("Path");
+			if (URi==null)
+			{
+			cL.getLogLines().add("No posee URI de las URLs");
+			URi=new CompleteElementType();
+			URi.setClavilenoid(-1l);
+			}
+			
+			URi.setName("URI");
 			
 			ListaElementos.add(URi);
 	      
@@ -1292,19 +1192,18 @@ public class CollectionOdAaXLS {
 	        int columnsMax=ListaElementos.size();
 	       	
 	        
-	        for (int i = 0; i < 2; i++) {
-	        	Row fila = hoja.createRow(row);
-	        	row++;
+	        {
+	        		Row fila = hoja.createRow(row);
+	        		row++;
 	        	
-	        	if (i==0)
-	        	{
+
 	        		for (int j = 0; j < columnsMax+2; j++) {
 		        		
 		        		String Value = "";
 		            	if (j==0)
-		            		Value="Clavy Document Id ( DO NOT MODIFY THIS COLUMN )";
+		            		Value="Identificadotr URL";
 		            	else if (j==1)
-		            		Value="Description";
+		            		Value="Descripción";
 		            	else
 		            		{
 		            		CompleteElementType TmpEle = ListaElementos.get(j-2);
@@ -1331,43 +1230,7 @@ public class CollectionOdAaXLS {
 		            	}
 		            	
 		            	celda.setCellValue(Value);
-		            
-		           }
-	        	}
-	        	else if (i==1)
-	        	{
-	        		for (int j = 0; j < columnsMax+2; j++) {
-		        		
-		        		String Value = "";
-		        		if (j==0)
-		            		Value="Clavy Type Id ( DO NOT MODIFY THIS ROW )";
-		        		else if (j==1)
-		            		Value=Long.toString(grammar.getClavilenoid());
-		            	else 
-		            		{
-		            		CompleteElementType TmpEle = ListaElementos.get(j-2);
-		            		
-		            		Integer I=StaticFuctionsOdAaXLS.getIDODAD(TmpEle);
-		            		
-		            		if (I!=null)
-		            			Value=Integer.toString(I);
-		            		else
-		            			Value="#"+Long.toString(TmpEle.getClavilenoid());
-		            		
-		            		}
-		
-		            	
-		        		if (Value.length()>=32767)
-		            	{
-		            		cL.getLogLines().add("Tamaño de Texto en Valor del path del Tipo " + Value + " excesivo, no debe superar los 32767 caracteres, columna recortada");
-		            		Value.substring(0, 32766);
-		            	}
-		            		Cell celda = fila.createCell(j);
-		            	
-		            	celda.setCellValue(Value);
-		            
-		           }
-	        	}
+	        		}
 	        	
 			}	
 	        
@@ -1404,7 +1267,7 @@ public class CollectionOdAaXLS {
 	            	
 	            	String Value = "";
 	            	if (c==0)
-	            		Value=Long.toString(Doc.getClavilenoid());
+	            		Value="#"+Long.toString(Doc.getClavilenoid());
 	            	else if (c==1)
 	            		Value=Doc.getDescriptionText();
 	            	else
@@ -1614,7 +1477,19 @@ public class CollectionOdAaXLS {
 			if (completeElement instanceof CompleteTextElement)
     			return (((CompleteTextElement)completeElement).getValue());
 			else if (completeElement instanceof CompleteLinkElement)
-				return Long.toString((((CompleteLinkElement)completeElement).getValue().getClavilenoid()));
+				{
+				CompleteDocuments Elem = ((CompleteLinkElement)completeElement).getValue();
+				if (Elem!=null)
+					{
+					String Value = getIdov(Elem);
+					if (Value!=null)
+						return Value;
+					else
+						return "#"+Elem.getClavilenoid();
+//					return Long.toString((((CompleteLinkElement)completeElement).getValue().getClavilenoid()));
+					}
+				return "";
+				}
 			else if (completeElement instanceof CompleteResourceElementURL)
 				return (((CompleteResourceElementURL)completeElement).getValue());
 			else if (completeElement instanceof CompleteResourceElementFile)
@@ -1625,6 +1500,15 @@ public class CollectionOdAaXLS {
 		return "";
 	}
 	
+	private static String getIdov(CompleteDocuments Doc) {
+		for (CompleteElement elem : Doc.getDescription())
+			
+			if (elem instanceof CompleteTextElement && elem.getHastype() instanceof CompleteTextElementType &&StaticFuctionsOdAaXLS.isIDOV((CompleteTextElementType)elem.getHastype()))
+				return ((CompleteTextElement)elem).getValue();
+		
+		return null;
+	}
+
 	/**
 	 *  Retorna el Texto que representa al path.
 	 * @param grammar 
