@@ -20,7 +20,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import fdi.ucm.server.modelComplete.collection.CompleteCollection;
-import fdi.ucm.server.modelComplete.collection.CompleteCollectionLog;
+import fdi.ucm.server.modelComplete.collection.CompleteLogAndUpdates;
 import fdi.ucm.server.modelComplete.collection.document.CompleteDocuments;
 import fdi.ucm.server.modelComplete.collection.document.CompleteElement;
 import fdi.ucm.server.modelComplete.collection.document.CompleteFile;
@@ -46,7 +46,7 @@ public class CollectionOdAaXLS {
 
 	
 
-	public static String processCompleteCollection(CompleteCollectionLog cL,
+	public static String processCompleteCollection(CompleteLogAndUpdates cL,
 			CompleteCollection salvar, boolean soloEstructura, String pathTemporalFiles) throws IOException {
 		
 		 /*La ruta donde se creará el archivo*/
@@ -275,7 +275,7 @@ public class CollectionOdAaXLS {
 	 * @param virtualObject
 	 */
 	private static void processDatos(Sheet hoja, CompleteElementType grammar,
-			HashMap<Long, Integer> clave, CompleteCollectionLog cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura, Long gramarId) {
+			HashMap<Long, Integer> clave, CompleteLogAndUpdates cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura, Long gramarId) {
 		  
 	  
 		List<CompleteElementType> ListaElementos;
@@ -498,7 +498,7 @@ public class CollectionOdAaXLS {
 	 * @param virtualObject
 	 */
 	private static void processMetadatos(Sheet hoja, CompleteElementType grammar,
-			HashMap<Long, Integer> clave, CompleteCollectionLog cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura) {
+			HashMap<Long, Integer> clave, CompleteLogAndUpdates cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura) {
 		  
 
 		
@@ -700,7 +700,7 @@ public class CollectionOdAaXLS {
 	 * @param virtualObject
 	 */
 	private static void processRecursos(Sheet hoja, CompleteElementType grammar,
-			HashMap<Long, Integer> clave, CompleteCollectionLog cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura) {
+			HashMap<Long, Integer> clave, CompleteLogAndUpdates cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura) {
 		  
 
 		
@@ -980,7 +980,7 @@ public class CollectionOdAaXLS {
 	 * @param virtualObject
 	 */
 	private static void processFiles(Sheet hoja, CompleteGrammar grammar,
-			HashMap<Long, Integer> clave, CompleteCollectionLog cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura) {
+			HashMap<Long, Integer> clave, CompleteLogAndUpdates cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura) {
 		  
 	  
 	        
@@ -1160,7 +1160,7 @@ public class CollectionOdAaXLS {
 	 * @param virtualObject
 	 */
 	private static void processURls(Sheet hoja, CompleteGrammar grammar,
-			HashMap<Long, Integer> clave, CompleteCollectionLog cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura) {
+			HashMap<Long, Integer> clave, CompleteLogAndUpdates cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura) {
 		  
 	  
 	        
@@ -1467,7 +1467,7 @@ public class CollectionOdAaXLS {
 		 
 		  
 		  
-		  processCompleteCollection(new CompleteCollectionLog(), CC, false, System.getProperty("user.home"));
+		  processCompleteCollection(new CompleteLogAndUpdates(), CC, false, System.getProperty("user.home"));
 		  
 	    }
 
