@@ -66,7 +66,7 @@ public class CollectionOdAaXLS {
         
         /*Utilizamos la clase Sheet para crear una nueva hoja de trabajo dentro del libro que creamos anteriormente*/
         
-        HashMap<Long, Integer> clave=new HashMap<Long, Integer>();	
+//        HashMap<Long, Integer> clave=new HashMap<Long, Integer>();	
         
 //        Sheet hoja;
         
@@ -91,7 +91,9 @@ public class CollectionOdAaXLS {
 	   		ListaDocumentosF=generaDocs(salvar.getEstructuras(),Files);
 	   	
 	    
-	    processFiles(HojaF,Files,clave,cL,ListaDocumentosF,soloEstructura);
+	    processFiles(HojaF,Files,
+//	    		clave,
+	    		cL,ListaDocumentosF,soloEstructura);
         		 
         	 
 
@@ -108,7 +110,9 @@ public class CollectionOdAaXLS {
 	    else
 	    	ListaDocumentosU=generaDocs(salvar.getEstructuras(),URLS);
 	    
-	    processURls(HojaU,URLS,clave,cL,ListaDocumentosU,soloEstructura);
+	    processURls(HojaU,URLS,
+//	    		clave,
+	    		cL,ListaDocumentosU,soloEstructura);
         		 
         	 
 
@@ -151,9 +155,15 @@ public class CollectionOdAaXLS {
  			Recursos.setClavilenoid(-3l);
  			}
         	 
-        		 processDatos(HojaD,Datos,clave,cL,ListaDocumentosOV,soloEstructura,VirtualObject.getClavilenoid());
-        		 processMetadatos(HojaM,MetaDatos,clave,cL,ListaDocumentosOV,soloEstructura);
-        		 processRecursos(HojaR,Recursos,clave,cL,ListaDocumentosOV,soloEstructura);
+        		 processDatos(HojaD,Datos
+//        				 ,clave
+        				 ,cL,ListaDocumentosOV,soloEstructura,VirtualObject.getClavilenoid());
+        		 processMetadatos(HojaM,MetaDatos
+//        				 ,clave
+        				 ,cL,ListaDocumentosOV,soloEstructura);
+        		 processRecursos(HojaR,Recursos
+//        				 ,clave
+        				 ,cL,ListaDocumentosOV,soloEstructura);
         	
 
 
@@ -275,9 +285,13 @@ public class CollectionOdAaXLS {
 	 * @param virtualObject
 	 */
 	private static void processDatos(Sheet hoja, CompleteElementType grammar,
-			HashMap<Long, Integer> clave, CompleteLogAndUpdates cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura, Long gramarId) {
+			
+//			HashMap<Long, Integer> clave, 
+			
+			CompleteLogAndUpdates cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura, Long gramarId) {
 		  
 	  
+		HashMap<Long, Integer> clave=new HashMap<Long, Integer>();
 		List<CompleteElementType> ListaElementos;
 	     
 		CompleteTextElementType IDOV=null;
@@ -498,11 +512,12 @@ public class CollectionOdAaXLS {
 	 * @param virtualObject
 	 */
 	private static void processMetadatos(Sheet hoja, CompleteElementType grammar,
-			HashMap<Long, Integer> clave, CompleteLogAndUpdates cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura) {
+//			HashMap<Long, Integer> clave,
+			CompleteLogAndUpdates cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura) {
 		  
 
 		
-
+		HashMap<Long, Integer> clave=new HashMap<Long, Integer>();
 		 List<CompleteElementType> ListaElementos=generaLista(grammar);
 	        
 
@@ -700,11 +715,12 @@ public class CollectionOdAaXLS {
 	 * @param virtualObject
 	 */
 	private static void processRecursos(Sheet hoja, CompleteElementType grammar,
-			HashMap<Long, Integer> clave, CompleteLogAndUpdates cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura) {
+//			HashMap<Long, Integer> clave,
+			CompleteLogAndUpdates cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura) {
 		  
 
 		
-
+		HashMap<Long, Integer> clave=new HashMap<Long, Integer>();
 		 List<CompleteElementType> ListaElementos=generaLista(grammar);
 	        
 
@@ -980,9 +996,10 @@ public class CollectionOdAaXLS {
 	 * @param virtualObject
 	 */
 	private static void processFiles(Sheet hoja, CompleteGrammar grammar,
-			HashMap<Long, Integer> clave, CompleteLogAndUpdates cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura) {
+//			HashMap<Long, Integer> clave,
+			CompleteLogAndUpdates cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura) {
 		  
-	  
+		HashMap<Long, Integer> clave=new HashMap<Long, Integer>();
 	        
 		  
 			List<CompleteElementType> ListaElementos=new ArrayList<CompleteElementType>();
@@ -1160,9 +1177,10 @@ public class CollectionOdAaXLS {
 	 * @param virtualObject
 	 */
 	private static void processURls(Sheet hoja, CompleteGrammar grammar,
-			HashMap<Long, Integer> clave, CompleteLogAndUpdates cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura) {
+//			HashMap<Long, Integer> clave,
+			CompleteLogAndUpdates cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura) {
 		  
-	  
+		HashMap<Long, Integer> clave=new HashMap<Long, Integer>();
 	        
 		  
 			List<CompleteElementType> ListaElementos=new ArrayList<CompleteElementType>();
