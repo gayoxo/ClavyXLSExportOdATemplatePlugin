@@ -5,6 +5,8 @@ package fdi.ucm.server.exportparser.odaaxls;
 
 import java.util.ArrayList;
 
+import fdi.ucm.server.modelComplete.collection.document.CompleteElement;
+import fdi.ucm.server.modelComplete.collection.document.CompleteOperationalValue;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteElementType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteGrammar;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteOperationalValueType;
@@ -261,6 +263,70 @@ public class StaticFuctionsOdAaXLS {
 						if (CompleteOperationalValueType.getDefault().equals(StaticNamesOdAaXLS.IDOV)) 
 										return true;
 
+				}
+			}
+		}
+		return false;
+	}
+	
+
+	/**
+	 * Clase que define si es numerico
+	 * @param hastype
+	 * @return
+	 */
+	public static boolean isNumeric(CompleteElementType hastype) {
+		ArrayList<CompleteOperationalView> Shows = hastype.getShows();
+		for (CompleteOperationalView show : Shows) {	
+			if (show.getName().equals(StaticNamesOdAaXLS.METATYPE))
+			{
+				ArrayList<CompleteOperationalValueType> ShowValue = show.getValues();
+				for (CompleteOperationalValueType showValues : ShowValue) {
+					if (showValues.getName().equals(StaticNamesOdAaXLS.METATYPETYPE))
+							if (showValues.getDefault().equals(StaticNamesOdAaXLS.NUMERIC)) 
+										return true;
+				}
+			}
+		}
+		return false;
+	}
+
+
+
+
+
+
+
+
+	public static boolean isNumeric(CompleteElement elem) {
+		ArrayList<CompleteOperationalValue> ShowsInst = elem.getShows();
+		for (CompleteOperationalValue show : ShowsInst) {
+			if (show.getType().getView().getName().equals(StaticNamesOdAaXLS.METATYPE)&&show.getType().getName().equals(StaticNamesOdAaXLS.METATYPETYPE))
+				if (show.getValue().equals(StaticNamesOdAaXLS.NUMERIC))
+					return true;
+		}
+		
+		return isNumeric(elem.getHastype());
+		
+	}
+
+
+
+
+
+
+
+
+	public static boolean isDate(CompleteElementType attribute) {
+		ArrayList<CompleteOperationalView> Shows = attribute.getShows();
+		for (CompleteOperationalView show : Shows) {	
+			if (show.getName().equals(StaticNamesOdAaXLS.METATYPE))
+			{
+				ArrayList<CompleteOperationalValueType> ShowValue = show.getValues();
+				for (CompleteOperationalValueType showValues : ShowValue) {
+					if (showValues.getName().equals(StaticNamesOdAaXLS.METATYPETYPE))
+							if (showValues.getDefault().equals(StaticNamesOdAaXLS.DATE)) 
+										return true;
 				}
 			}
 		}

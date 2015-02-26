@@ -26,4 +26,12 @@ public class StaticNamesOdAaXLS {
 	public static final String URL = "URL";
 	public static final String URI = "URI";
 	
+	public static final String METATYPE = "Meta Type";
+	public static final String METATYPETYPE = "Type";
+	public static final String NUMERIC = "Numeric";
+	public static final String TEXT = "Text";
+	public static final String BOOLEAN = "Boolean";
+	public static final String DATE = "Date";
+	public static final String CONTROLED = "Controled";
+	
 }

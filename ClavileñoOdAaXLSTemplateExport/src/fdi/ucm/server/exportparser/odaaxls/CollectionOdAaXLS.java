@@ -6,8 +6,11 @@ package fdi.ucm.server.exportparser.odaaxls;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -1547,7 +1550,86 @@ public class CollectionOdAaXLS {
 	private static String getValueFromElement(CompleteElement completeElement) {
 		try {
 			if (completeElement instanceof CompleteTextElement)
-    			return (((CompleteTextElement)completeElement).getValue());
+    			{
+				String ValueText=((CompleteTextElement)completeElement).getValue();
+				if (StaticFuctionsOdAaXLS.isNumeric(completeElement.getHastype()))
+				{
+					try {
+						Double D=Double.parseDouble(ValueText);
+						ValueText=D.toString();
+						
+						int p_ent= (int)D.intValue();
+						 
+						double p_dec= D - p_ent;
+						
+						if (p_dec==0)
+							ValueText=Integer.toString(p_ent);
+					
+					} catch (Exception e2) {
+					}
+				}
+				if (StaticFuctionsOdAaXLS.isDate(completeElement.getHastype()))
+				{
+					try {
+
+						
+						Date fecha = null;
+						//yyyy-MM-dd HH:mm:ss
+						try {
+							SimpleDateFormat formatoDelTexto = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+							fecha = formatoDelTexto.parse(ValueText);
+						} catch (Exception e) {
+							//Nada
+							fecha = null;
+						}
+						
+						if (fecha==null)
+							try {
+								SimpleDateFormat formatoDelTexto = new SimpleDateFormat("yyyy-MM-dd");
+								fecha = formatoDelTexto.parse(ValueText);
+							} catch (Exception e) {
+								//Nada
+								fecha = null;
+							}
+						
+						if (fecha==null)
+							try {
+								SimpleDateFormat formatoDelTexto = new SimpleDateFormat("yyyyMMdd");
+								fecha = formatoDelTexto.parse(ValueText);
+							} catch (Exception e) {
+								//Nada
+								fecha = null;
+							}
+						
+						if (fecha==null)
+							try {
+								SimpleDateFormat formatoDelTexto = new SimpleDateFormat("dd/MM/yyyy");
+								fecha = formatoDelTexto.parse(ValueText);
+							} catch (Exception e) {
+								//Nada
+								fecha = null;
+							}
+						
+						if (fecha==null)
+							try {
+								SimpleDateFormat formatoDelTexto = new SimpleDateFormat("dd/MM/yy");
+								fecha = formatoDelTexto.parse(ValueText);
+							} catch (Exception e) {
+								//Nada
+								fecha = null;
+							}
+						
+						if (fecha!=null)
+						{
+						DateFormat df = new SimpleDateFormat ("dd/MM/yyyy");
+						ValueText=df.format(fecha);	
+						}
+					} catch (Exception e2) {
+					}
+
+				}
+				return ValueText;
+    			}
 			else if (completeElement instanceof CompleteLinkElement)
 				{
 				CompleteDocuments Elem = ((CompleteLinkElement)completeElement).getValue();
