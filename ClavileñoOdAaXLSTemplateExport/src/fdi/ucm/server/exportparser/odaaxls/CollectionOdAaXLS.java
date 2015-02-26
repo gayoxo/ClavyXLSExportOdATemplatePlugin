@@ -524,7 +524,7 @@ public class CollectionOdAaXLS {
 	            		{
 	            			if (temp.size()>0){
 	            			CompleteElement completeElement=temp.get(0);
-	            			Value=getValueFromElement(completeElement);
+	            			Value=getValueFromElement(completeElement,cL);
 	            		}
 
 	            		
@@ -724,7 +724,7 @@ public class CollectionOdAaXLS {
 		            		{
 		            			if (temp.size()>0){
 		            			CompleteElement completeElement=temp.get(0);
-		            			Value=getValueFromElement(completeElement);
+		            			Value=getValueFromElement(completeElement,cL);
 		            			
 		            		}
 
@@ -994,7 +994,7 @@ public class CollectionOdAaXLS {
 			            		{
 			            			if (temp.size()>0){
 			            			CompleteElement completeElement=temp.get(0);
-			            			Value=getValueFromElement(completeElement);
+			            			Value=getValueFromElement(completeElement,cL);
 			            		}
 
 			            		
@@ -1189,7 +1189,7 @@ public class CollectionOdAaXLS {
 		            		{
 		            		if (temp.size()>0){
 		            			CompleteElement completeElement=temp.get(0);
-		            			Value=getValueFromElement(completeElement);
+		            			Value=getValueFromElement(completeElement,cL);
 		            		}
 
 		            		
@@ -1353,7 +1353,7 @@ public class CollectionOdAaXLS {
 		            		{
 		            			if (temp.size()>0){
 		            			CompleteElement completeElement=temp.get(0);
-		            			Value=getValueFromElement(completeElement);
+		            			Value=getValueFromElement(completeElement,cL);
 		            		}
 
 		            		
@@ -1547,7 +1547,7 @@ public class CollectionOdAaXLS {
 	    }
 
 
-	private static String getValueFromElement(CompleteElement completeElement) {
+	private static String getValueFromElement(CompleteElement completeElement,CompleteLogAndUpdates cL) {
 		try {
 			if (completeElement instanceof CompleteTextElement)
     			{
@@ -1594,6 +1594,15 @@ public class CollectionOdAaXLS {
 						
 						if (fecha==null)
 							try {
+								SimpleDateFormat formatoDelTexto = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+								fecha = formatoDelTexto.parse(ValueText);
+							} catch (Exception e) {
+								//Nada
+								fecha = null;
+							}
+						
+						if (fecha==null)
+							try {
 								SimpleDateFormat formatoDelTexto = new SimpleDateFormat("yyyyMMdd");
 								fecha = formatoDelTexto.parse(ValueText);
 							} catch (Exception e) {
@@ -1623,6 +1632,10 @@ public class CollectionOdAaXLS {
 						{
 						DateFormat df = new SimpleDateFormat ("dd/MM/yyyy");
 						ValueText=df.format(fecha);	
+						}
+						else
+						{
+							cL.getLogLines().add("Problemas al parsear la fecha  " + ValueText + "  solo formatos compatibles yyyy-MM-dd HH:mm:ss ó yyyy-MM-dd HH:mm ó yyyy-MM-dd ó yyyyMMdd ó dd/MM/yyyy ó dd/MM/yy");
 						}
 					} catch (Exception e2) {
 					}
