@@ -1594,6 +1594,15 @@ public class CollectionOdAaXLS {
 						
 						if (fecha==null)
 							try {
+								SimpleDateFormat formatoDelTexto = new SimpleDateFormat("dd-MM-yyyy");
+								fecha = formatoDelTexto.parse(ValueText);
+							} catch (Exception e) {
+								//Nada
+								fecha = null;
+							}
+						
+						if (fecha==null)
+							try {
 								SimpleDateFormat formatoDelTexto = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 								fecha = formatoDelTexto.parse(ValueText);
 							} catch (Exception e) {
@@ -1635,7 +1644,7 @@ public class CollectionOdAaXLS {
 						}
 						else
 						{
-							cL.getLogLines().add("Problemas al parsear la fecha  " + ValueText + "  solo formatos compatibles yyyy-MM-dd HH:mm:ss ó yyyy-MM-dd HH:mm ó yyyy-MM-dd ó yyyyMMdd ó dd/MM/yyyy ó dd/MM/yy");
+							cL.getLogLines().add("Problemas al parsear la fecha  " + ValueText + "  solo formatos compatibles yyyy-MM-dd HH:mm:ss ó yyyy-MM-dd HH:mm ó yyyy-MM-dd ó yyyyMMdd ó dd/MM/yyyy ó dd/MM/yy ó dd-MM-yyyy");
 						}
 					} catch (Exception e2) {
 					}
