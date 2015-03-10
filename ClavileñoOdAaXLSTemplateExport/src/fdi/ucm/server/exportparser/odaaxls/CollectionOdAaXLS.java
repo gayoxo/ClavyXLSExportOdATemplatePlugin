@@ -1412,7 +1412,7 @@ public class CollectionOdAaXLS {
 		 for (CompleteStructure completeelem : completegramar.getSons()) {
 			 	if (completeelem instanceof CompleteElementType)
 			 		{
-			 		if (completeelem instanceof CompleteTextElementType||completeelem instanceof CompleteLinkElementType||completeelem instanceof CompleteResourceElementType)
+			 		if ((completeelem instanceof CompleteTextElementType||completeelem instanceof CompleteLinkElementType||completeelem instanceof CompleteResourceElementType)&&(!StaticFuctionsOdAaXLS.isIgnored((CompleteElementType)completeelem)))
 			 			ListaElementos.add((CompleteElementType)completeelem);
 			 		}
 				ListaElementos.addAll(generaLista(completeelem));

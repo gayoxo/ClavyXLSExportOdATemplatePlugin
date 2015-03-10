@@ -332,4 +332,22 @@ public class StaticFuctionsOdAaXLS {
 		}
 		return false;
 	}
+	
+	public static boolean isIgnored(CompleteElementType hastype) {
+		ArrayList<CompleteOperationalView> Shows = hastype.getShows();
+		for (CompleteOperationalView show : Shows) {
+			
+			if (show.getName().equals(StaticNamesOdAaXLS.META))
+			{
+				ArrayList<CompleteOperationalValueType> ShowValue = show.getValues();
+				for (CompleteOperationalValueType CompleteOperationalValueType : ShowValue) {
+					if (CompleteOperationalValueType.getName().equals(StaticNamesOdAaXLS.TYPE))
+						if (CompleteOperationalValueType.getDefault().equals(StaticNamesOdAaXLS.IGNORED)) 
+										return true;
+
+				}
+			}
+		}
+		return false;
+	}
 }

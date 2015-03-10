@@ -33,5 +33,6 @@ public class StaticNamesOdAaXLS {
 	public static final String BOOLEAN = "Boolean";
 	public static final String DATE = "Date";
 	public static final String CONTROLED = "Controled";
+	public static final String IGNORED = "IGNORED";
 	
 }
