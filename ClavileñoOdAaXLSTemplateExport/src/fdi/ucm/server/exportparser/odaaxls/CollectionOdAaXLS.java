@@ -1391,7 +1391,7 @@ public class CollectionOdAaXLS {
 			List<CompleteDocuments> list, CompleteGrammar grammar) {
 		ArrayList<CompleteDocuments> ListaDoc=new ArrayList<CompleteDocuments>();
 		for (CompleteDocuments completeDocuments : list) {
-			if (completeDocuments.getDocument()==grammar)
+			if (StaticFuctionsOdAaXLS.isInGrammar(completeDocuments,grammar))
 				ListaDoc.add(completeDocuments);
 		}
 		return ListaDoc;
@@ -1465,7 +1465,7 @@ public class CollectionOdAaXLS {
 			  int docsN=(new Random()).nextInt(5);
 			  docsN=docsN+5;
 			for (int j = 0; j < docsN; j++) {
-				CompleteDocuments CDDD=new CompleteDocuments(new Long(id), CC, G1, "", "");
+				CompleteDocuments CDDD=new CompleteDocuments(new Long(id), CC, "", "");
 				CC.getEstructuras().add(CDDD);
 				 id++;
 				CD.add(CDDD);
