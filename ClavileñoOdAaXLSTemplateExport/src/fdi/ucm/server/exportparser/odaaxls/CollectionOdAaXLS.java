@@ -4,18 +4,18 @@
 package fdi.ucm.server.exportparser.odaaxls;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Random;
-
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -26,18 +26,14 @@ import fdi.ucm.server.modelComplete.collection.CompleteCollection;
 import fdi.ucm.server.modelComplete.collection.CompleteLogAndUpdates;
 import fdi.ucm.server.modelComplete.collection.document.CompleteDocuments;
 import fdi.ucm.server.modelComplete.collection.document.CompleteElement;
-import fdi.ucm.server.modelComplete.collection.document.CompleteFile;
 import fdi.ucm.server.modelComplete.collection.document.CompleteLinkElement;
-import fdi.ucm.server.modelComplete.collection.document.CompleteResourceElement;
 import fdi.ucm.server.modelComplete.collection.document.CompleteResourceElementFile;
 import fdi.ucm.server.modelComplete.collection.document.CompleteResourceElementURL;
 import fdi.ucm.server.modelComplete.collection.document.CompleteTextElement;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteElementType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteGrammar;
-import fdi.ucm.server.modelComplete.collection.grammar.CompleteIterator;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteLinkElementType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteResourceElementType;
-import fdi.ucm.server.modelComplete.collection.grammar.CompleteStructure;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteTextElementType;
 
 /**
@@ -138,7 +134,7 @@ public class CollectionOdAaXLS {
         
         	 CompleteElementType Datos=findDatos(VirtualObject.getSons());
         	 CompleteElementType MetaDatos=findMetaDatos(VirtualObject.getSons());
-        	 CompleteElementType Recursos=findResources(VirtualObject.getSons());
+        	List<CompleteElementType> Recursos=findResources(VirtualObject.getSons());
 //        	 CompleteElementType RecursosLink=findResourcesLink(VirtualObject.getSons());
         	 
         	 if (Datos==null)
@@ -153,11 +149,13 @@ public class CollectionOdAaXLS {
  			MetaDatos=new CompleteElementType();
  			MetaDatos.setClavilenoid(-2l);
  			}
-        	 if (Recursos==null)
+        	 if (Recursos==null||Recursos.isEmpty())
  			{
  			cL.getLogLines().add("No posee Recursos");
- 			Recursos=new CompleteElementType();
- 			Recursos.setClavilenoid(-3l);
+ 			Recursos=new LinkedList<CompleteElementType>();
+ 			CompleteElementType RecursosU=new CompleteElementType();
+ 			RecursosU.setClavilenoid(-3l);
+ 			Recursos.add(RecursosU);
  			}
         	 
         		 processDatos(HojaD,Datos
@@ -250,34 +248,42 @@ public class CollectionOdAaXLS {
 			
 		}
 
-	private static CompleteElementType findDatos(ArrayList<CompleteStructure> sons) {
-		  for (CompleteStructure completeStruct : sons) {
+	private static CompleteElementType findDatos(ArrayList<CompleteElementType> sons) {
+		  for (CompleteElementType completeStruct : sons) {
 				if (completeStruct instanceof CompleteElementType && StaticFuctionsOdAaXLS.isDatos((CompleteElementType)completeStruct))
 					return (CompleteElementType)completeStruct;
 			}
 			return null;
 	}
 	  
-	  private static CompleteElementType findMetaDatos(ArrayList<CompleteStructure> sons) {
-		  for (CompleteStructure completeStruct : sons) {
+	  private static CompleteElementType findMetaDatos(ArrayList<CompleteElementType> sons) {
+		  for (CompleteElementType completeStruct : sons) {
 				if (completeStruct instanceof CompleteElementType && StaticFuctionsOdAaXLS.isMetaDatos((CompleteElementType)completeStruct))
 					return (CompleteElementType)completeStruct;
 			}
 			return null;
 	}
 
-	  private static CompleteElementType findResources(ArrayList<CompleteStructure> sons) {
+	  private static List<CompleteElementType> findResources(ArrayList<CompleteElementType> sons) {
 		  
-		  for (CompleteStructure completeStruct : sons) {
-			  if (completeStruct instanceof CompleteIterator)
-				  for (CompleteStructure completeStruct2 : completeStruct.getSons()) {
-						if (completeStruct2 instanceof CompleteElementType && StaticFuctionsOdAaXLS.isResources((CompleteElementType)completeStruct2))
-							return (CompleteElementType)completeStruct2;
-					}
+		  CompleteElementType ResourcesBase=null;
+		 List<CompleteElementType> Salida=new LinkedList<CompleteElementType>();
+		  for (CompleteElementType completeStruct : sons) {
+			  	if (completeStruct instanceof CompleteElementType && StaticFuctionsOdAaXLS.isResources((CompleteElementType)completeStruct))
+							{
+			  				ResourcesBase= (CompleteElementType)completeStruct;
+							break;
+							}
 		}
 		  
 		  
-			return null;
+		  for (CompleteElementType completeStruct : sons) {
+					if (completeStruct instanceof CompleteElementType && StaticFuctionsOdAaXLS.isResources((CompleteElementType)completeStruct)
+							&&(completeStruct.getClassOfIterator().equals(ResourcesBase)||completeStruct==ResourcesBase))
+						Salida.add((CompleteElementType)completeStruct);
+	}
+		  
+			return Salida;
 	}
 	 
 
@@ -305,24 +311,24 @@ public class CollectionOdAaXLS {
 		return null;
 	}
 	
-	private static CompleteElementType findFilesFisico(List<CompleteStructure> metaStructures) {
-		for (CompleteStructure completeStructure : metaStructures) {
+	private static CompleteElementType findFilesFisico(List<CompleteElementType> metaStructures) {
+		for (CompleteElementType completeStructure : metaStructures) {
 			if (completeStructure instanceof CompleteElementType&&StaticFuctionsOdAaXLS.isFileFisico((CompleteElementType)completeStructure))
 				return (CompleteElementType) completeStructure;
 		}
 		return null;
 	}
 	
-	private static CompleteElementType findOwner(List<CompleteStructure> metaStructures) {
-		for (CompleteStructure completeStructure : metaStructures) {
+	private static CompleteElementType findOwner(List<CompleteElementType> metaStructures) {
+		for (CompleteElementType completeStructure : metaStructures) {
 			if (completeStructure instanceof CompleteElementType&&StaticFuctionsOdAaXLS.isOwner((CompleteElementType)completeStructure))
 				return (CompleteElementType) completeStructure;
 		}
 		return null;
 	}
 	
-	private static CompleteElementType findURI(List<CompleteStructure> metaStructures) {
-		for (CompleteStructure completeStructure : metaStructures) {
+	private static CompleteElementType findURI(List<CompleteElementType> metaStructures) {
+		for (CompleteElementType completeStructure : metaStructures) {
 			if (completeStructure instanceof CompleteElementType&&StaticFuctionsOdAaXLS.isURI((CompleteElementType)completeStructure))
 				return (CompleteElementType) completeStructure;
 		}
@@ -771,19 +777,34 @@ public class CollectionOdAaXLS {
 	 * @param soloEstructura
 	 * @param virtualObject
 	 */
-	private static void processRecursos(Sheet hoja, CompleteElementType grammar,
+	private static void processRecursos(Sheet hoja, List<CompleteElementType> grammar,
 //			HashMap<Long, Integer> clave,
 			CompleteLogAndUpdates cL, List<CompleteDocuments> ListaDocumentos, boolean soloEstructura) {
 		  
 
 		
 		HashMap<Long, Integer> clave=new HashMap<Long, Integer>();
-		 List<CompleteElementType> ListaElementos=generaLista(grammar);
+		
+		CompleteElementType padrePrincipal = grammar.get(0);
+		
+		for (CompleteElementType completeDocuments : grammar)
+			if (completeDocuments.getClassOfIterator()!=null&&completeDocuments.getClassOfIterator()!=padrePrincipal)
+				padrePrincipal=completeDocuments.getClassOfIterator();
+		
+		HashMap<CompleteElementType, CompleteElementType> EquivalenRec=new HashMap<CompleteElementType, CompleteElementType>();
+		for (CompleteElementType elemeni : grammar) {
+			List<CompleteElementType> ListaElementosT=generaLista(elemeni);
+			for (CompleteElementType completeElementType : ListaElementosT) {
+				EquivalenRec.put(completeElementType, elemeni);
+			}
+		}
+		
+		 List<CompleteElementType> ListaElementos=generaLista(padrePrincipal);
 	        
 
 	        if (ListaElementos.size()>255)
 	        	{
-	        	cL.getLogLines().add("Tamaño de estructura demasiado grande para exportar a xls para gramatica: " + grammar.getName() +" solo 255 estructuras seran grabadas, divide en gramaticas mas simples");
+	        	cL.getLogLines().add("Tamaño de estructura demasiado grande para exportar a xls para gramatica: " + padrePrincipal.getName() +" solo 255 estructuras seran grabadas, divide en gramaticas mas simples");
 	        	ListaElementos=ListaElementos.subList(0, 254);
 	        	}
 	
@@ -815,7 +836,7 @@ public class CollectionOdAaXLS {
 		            	else
 		            		{
 		            		CompleteElementType TmpEle = ListaElementos.get(j-2);
-		            		Value=pathFather(TmpEle,grammar);
+		            		Value=pathFather(TmpEle,padrePrincipal);
 		            		}
 		
 		            	
@@ -849,7 +870,7 @@ public class CollectionOdAaXLS {
 		        		if (j==0)
 		            		Value="Identificador tipo( NO MODIFICAR )";
 		        		else if (j==1)
-		            		Value=Long.toString(grammar.getClavilenoid());
+		            		Value=Long.toString(padrePrincipal.getClavilenoid());
 		            	else 
 		            		{
 		            		CompleteElementType TmpEle = ListaElementos.get(j-2);
@@ -889,28 +910,38 @@ public class CollectionOdAaXLS {
 	            CompleteDocuments Doc=ListaDocumentos.get(f);
 	            
 	            
-            
-	            HashMap<Integer, ArrayList<CompleteElement>> ListaAmbito=new HashMap<Integer, ArrayList<CompleteElement>>();
-	            HashMap<Integer,String> ListaRelacionesporAmbito=new HashMap<Integer,String>();
 	            
 	            String DocID=null;
 	            
-	            for (CompleteElement elem : Doc.getDescription()) {
-					Integer val=clave.get(elem.getHastype().getClavilenoid());
+	            HashMap<Long, ArrayList<CompleteElement>> ListaAmbito= new HashMap<Long, ArrayList<CompleteElement>>();
+	            
+				HashMap<Long, String> ListaRelacionesporAmbito = new HashMap<Long, String>();
+				
+				for (CompleteElement elem : Doc.getDescription()) {
+	            	
+					Integer val=null;
+					if (elem.getHastype().getClassOfIterator()==null)
+							val=clave.get(elem.getHastype().getClavilenoid());
+					else
+							val=clave.get(elem.getHastype().getClassOfIterator().getClavilenoid());
 					
 					if (val==null&&elem instanceof CompleteTextElement && elem.getHastype() instanceof CompleteTextElementType &&StaticFuctionsOdAaXLS.isIDOV((CompleteTextElementType)elem.getHastype()))
 						DocID=((CompleteTextElement)elem).getValue();
 						
 					
-					if (val!=null&&elem.getAmbitos().size()>0)
+					if (val!=null)
 						{
-						ArrayList<CompleteElement> Lis=ListaAmbito.get(elem.getAmbitos().get(0));
-						if (Lis==null)
-							{
-							Lis=new ArrayList<CompleteElement>();
-							}
-						Lis.add(elem);
-						ListaAmbito.put(elem.getAmbitos().get(0), Lis);
+						CompleteElementType resourceType = EquivalenRec.get(elem.getHastype());
+						if (resourceType!=null)
+						{
+							ArrayList<CompleteElement> Lis=ListaAmbito.get(resourceType.getClavilenoid());
+							if (Lis==null)
+								{
+								Lis=new ArrayList<CompleteElement>();
+								}
+							Lis.add(elem);
+							ListaAmbito.put(resourceType.getClavilenoid(), Lis);
+						}
 						}
 					
 					if (elem instanceof CompleteLinkElement)
@@ -938,23 +969,32 @@ public class CollectionOdAaXLS {
 							Val ="#"+Long.toString(((CompleteLinkElement) elem).getValue().getClavilenoid());	
 							}
 						
-						ListaRelacionesporAmbito.put(elem.getAmbitos().get(0), Val);
+						ListaRelacionesporAmbito .put(elem.getHastype().getClavilenoid(), Val);
 						
 						}
-					}
+						
+						
+						}
+					
 				}
 	            
 	            
 	            
 	            
-	            for (Entry<Integer, String> listarelaciones : ListaRelacionesporAmbito.entrySet()) {
+	            for (Entry<Long, String> listarelaciones : ListaRelacionesporAmbito.entrySet()) {
 	            	ArrayList<CompleteElement> Elems=ListaAmbito.get(listarelaciones.getKey());
 	            	if (Elems==null)
 	            		Elems=new ArrayList<CompleteElement>();
 	            	
 	            	HashMap<Integer, ArrayList<CompleteElement>> ListaClave=new HashMap<Integer, ArrayList<CompleteElement>>();
 		            for (CompleteElement elem : Elems) {
-						Integer val=clave.get(elem.getHastype().getClavilenoid());
+		            	
+		            	Integer val=null;
+						if (elem.getHastype().getClassOfIterator()==null)
+								val=clave.get(elem.getHastype().getClavilenoid());
+						else
+								val=clave.get(elem.getHastype().getClassOfIterator().getClavilenoid());
+						
 						if (val!=null)
 							{
 							ArrayList<CompleteElement> Lis=ListaClave.get(val);
@@ -1409,7 +1449,7 @@ public class CollectionOdAaXLS {
 	private static ArrayList<CompleteElementType> generaLista(
 			CompleteElementType completegramar) {
 		 ArrayList<CompleteElementType> ListaElementos = new ArrayList<CompleteElementType>();
-		 for (CompleteStructure completeelem : completegramar.getSons()) {
+		 for (CompleteElementType completeelem : completegramar.getSons()) {
 			 	if (completeelem instanceof CompleteElementType)
 			 		{
 			 		if ((completeelem instanceof CompleteTextElementType||completeelem instanceof CompleteLinkElementType||completeelem instanceof CompleteResourceElementType)&&(!StaticFuctionsOdAaXLS.isIgnored((CompleteElementType)completeelem)))
@@ -1434,117 +1474,67 @@ public class CollectionOdAaXLS {
 //		 return ListaElementos;
 //	}
 
-	private static Collection<? extends CompleteElementType> generaLista(
-			CompleteStructure completeelementPadre) {
-		 ArrayList<CompleteElementType> ListaElementos = new ArrayList<CompleteElementType>();
-		 for (CompleteStructure completeelem : completeelementPadre.getSons()) {
-			 	if (completeelem instanceof CompleteElementType)
-			 		{
-			 		if (completeelem instanceof CompleteTextElementType||completeelem instanceof CompleteLinkElementType||completeelem instanceof CompleteResourceElementType)
-			 			ListaElementos.add((CompleteElementType)completeelem);
-			 		}
-				ListaElementos.addAll(generaLista(completeelem));
-			}
-		 return ListaElementos;
-	}
+//	private static Collection<? extends CompleteElementType> generaLista(
+//			CompleteElementType completeelementPadre) {
+//		 ArrayList<CompleteElementType> ListaElementos = new ArrayList<CompleteElementType>();
+//		 for (CompleteElementType completeelem : completeelementPadre.getSons()) {
+//			 	if (completeelem instanceof CompleteElementType)
+//			 		{
+//			 		if (completeelem instanceof CompleteTextElementType||completeelem instanceof CompleteLinkElementType||completeelem instanceof CompleteResourceElementType)
+//			 			ListaElementos.add((CompleteElementType)completeelem);
+//			 		}
+//				ListaElementos.addAll(generaLista(completeelem));
+//			}
+//		 return ListaElementos;
+//	}
 	
 	
 	
 
 	public static void main(String[] args) throws Exception{
 		
-		int id=0;
 		
 		
+		String message="Exception .clavy-> Params Null ";
+		try {
+
+			
+			
+			String fileName = "test.clavy";
+			 System.out.println(fileName);
+			 
+
+			 File file = new File(fileName);
+			 FileInputStream fis = new FileInputStream(file);
+			 ObjectInputStream ois = new ObjectInputStream(fis);
+			 CompleteCollection object = (CompleteCollection) ois.readObject();
+			 
+			 
+			 try {
+				 ois.close();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+			
+			 try {
+				 fis.close();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+			 
+			 
 		
-		  CompleteCollection CC=new CompleteCollection("Lou Arreglate", "Arreglate ya!");
-		  for (int i = 0; i < 5; i++) {
-			  CompleteGrammar G1 = new CompleteGrammar(new Long(id),"Grammar"+i, i+"", CC);
-			  
-			  ArrayList<CompleteDocuments> CD=new ArrayList<CompleteDocuments>();
-			  int docsN=(new Random()).nextInt(5);
-			  docsN=docsN+5;
-			for (int j = 0; j < docsN; j++) {
-				CompleteDocuments CDDD=new CompleteDocuments(new Long(id), CC, "", "");
-				CC.getEstructuras().add(CDDD);
-				 id++;
-				CD.add(CDDD);
-			}
-			  
-			  id++;
-			  for (int j = 0; j < 5; j++) {
-				  CompleteElementType CX = new CompleteElementType(new Long(id),"Structure "+(i*10+j), G1);
-				  id++;
-				G1.getSons().add(CX);
-			}
-			  for (int j = 0; j < 5; j++) {
-				  CompleteTextElementType CX = new CompleteTextElementType(new Long(id),"Texto "+(i*10+j), G1);
-				  id++;
-				G1.getSons().add(CX);
-				
-				for (CompleteDocuments completeDocuments : CD) {
-					boolean docrep=(new Random()).nextBoolean();
-					if (docrep)
-						{
-						CompleteTextElement CTE=new CompleteTextElement(new Long(id), CX, "Texto "+(i*10+j));
-						id++;
-						completeDocuments.getDescription().add(CTE);
-						}
-				}
-				
-				
-				
-			}
-			  for (int j = 0; j < 5; j++) {
-				  CompleteLinkElementType CX = new CompleteLinkElementType(new Long(id),"Link "+(i*10+j), G1);
-				  id++;
-				G1.getSons().add(CX);
-				
-				for (CompleteDocuments completeDocuments : CD) {
-					boolean docrep=(new Random()).nextBoolean();
-					if (docrep)
-						{
-						CompleteLinkElement CTE=new CompleteLinkElement(new Long(id), CX, CD.get((new Random()).nextInt(CD.size())));
-						id++;
-						completeDocuments.getDescription().add(CTE);
-						}
-				}
-			}
-			  for (int j = 0; j < 5; j++) {
-				  CompleteResourceElementType CX = new CompleteResourceElementType(new Long(id),"Resource "+(i*10+j), G1);
-				  id++;
-				G1.getSons().add(CX);
-				
-				for (CompleteDocuments completeDocuments : CD) {
-					boolean docrep=(new Random()).nextBoolean();
-					if (docrep)
-						{
-						
-						boolean URL=(new Random()).nextBoolean();
-						CompleteResourceElement CTE;
-						if (URL)
-							CTE=new CompleteResourceElementURL(new Long(id), CX, "URL "+(i*10+j));
-						else 
-							{
-							CompleteFile FF = new CompleteFile(new Long(id), "Path File "+(i*10+j), CC);
-							CC.getSectionValues().add(FF);
-							id++;
-							CTE=new CompleteResourceElementFile(new Long(id), CX, FF);
-							}
-						id++;
-						completeDocuments.getDescription().add(CTE);
-						}
-				}
-				
-			}
-			  CC.getMetamodelGrammar().add(G1);
-		}
 		 
 		  
 		  
-		  processCompleteCollection(new CompleteLogAndUpdates(), CC, false, System.getProperty("user.home"));
+		  processCompleteCollection(new CompleteLogAndUpdates(), object, false, System.getProperty("user.home"));
 		  
-	    }
+	    }catch (Exception e) {
+			e.printStackTrace();
+			System.err.println(message);
+			throw new RuntimeException(message);
+		}
+		}
 
 
 	private static String getValueFromElement(CompleteElement completeElement,CompleteLogAndUpdates cL) {
@@ -1690,7 +1680,7 @@ public class CollectionOdAaXLS {
 	 * @param grammar 
 	 *  @return Texto cadena para el elemento
 	 */
-	public static String pathFather(CompleteStructure entrada, CompleteElementType grammar)
+	public static String pathFather(CompleteElementType entrada, CompleteElementType grammar)
 	{
 		String DataShow;
 		if (entrada instanceof CompleteElementType)
