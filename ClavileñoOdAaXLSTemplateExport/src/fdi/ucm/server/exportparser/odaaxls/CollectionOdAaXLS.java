@@ -369,6 +369,23 @@ public class CollectionOdAaXLS {
 				if (completeElementType instanceof CompleteTextElementType && StaticFuctionsOdAaXLS.isIDOV((CompleteTextElementType)completeElementType))
 					IDOV=(CompleteTextElementType)completeElementType;
 			}
+			
+			if (IDOV==null)
+			{
+				List<CompleteElementType> hijoprocesa=null;
+				if (grammar.getFather()!=null)
+					hijoprocesa=grammar.getFather().getSons();
+				else
+					if (grammar.getCollectionFather()!=null)
+						hijoprocesa=grammar.getCollectionFather().getSons();
+					else
+						hijoprocesa=new LinkedList<CompleteElementType>();
+					
+//				busca en mi padre
+				for (CompleteElementType cety: hijoprocesa) 
+					if (cety instanceof CompleteTextElementType && StaticFuctionsOdAaXLS.isIDOV((CompleteTextElementType)cety))
+						IDOV=(CompleteTextElementType)cety;
+			}
 		
 			
 			//Quito el IDOV de la lista
@@ -1501,6 +1518,10 @@ public class CollectionOdAaXLS {
 			
 			
 			String fileName = "test.clavy";
+			
+			if (args.length!=0)
+				fileName=args[0];
+			
 			 System.out.println(fileName);
 			 
 
